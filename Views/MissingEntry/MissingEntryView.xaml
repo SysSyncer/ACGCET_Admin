@@ -1,0 +1,120 @@
+<UserControl x:Class="ACGCET_Admin.Views.MissingEntry.MissingEntryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewmodels="clr-namespace:ACGCET_Admin.ViewModels.MissingEntry"
+             xmlns:views="clr-namespace:ACGCET_Admin.Views.MissingEntry"
+             xmlns:dashboardViews="clr-namespace:ACGCET_Admin.Views.Dashboard"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=viewmodels:MissingEntryViewModel}"
+             d:DesignHeight="700" d:DesignWidth="1100">
+
+    <UserControl.Resources>
+        <DataTemplate DataType="{x:Type viewmodels:MissingInternalEntryViewModel}">
+            <views:MissingInternalEntryView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:MissingExternalEntryViewModel}">
+            <views:MissingExternalEntryView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:MissingConvertEntryViewModel}">
+            <views:MissingConvertEntryView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:MissingResultEntryViewModel}">
+            <views:MissingResultEntryView/>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid Background="#FAFAFA">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="260"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ── Sub-Sidebar ──────────────────────────────────── -->
+        <Border Grid.Column="0" Background="White"
+                BorderThickness="0 0 1 0" BorderBrush="#E4E4E7"
+                ClipToBounds="True">
+            <DockPanel>
+                <!-- Header -->
+                <Border DockPanel.Dock="Top"
+                        Padding="16 16 16 14"
+                        BorderThickness="0 0 0 1" BorderBrush="#E4E4E7">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <md:PackIcon Kind="FileAlertOutline" Width="16" Height="16"
+                                         Foreground="#F97316" VerticalAlignment="Center"/>
+                            <TextBlock Text="MISSING ENTRY" FontSize="11" FontWeight="Bold"
+                                       Foreground="#7C3AED" Margin="8 0 0 0" VerticalAlignment="Center"
+                                       FontFamily="Segoe UI Variable Display, Segoe UI"/>
+                        </StackPanel>
+                        <TextBlock Text="Find &amp; Fix Missing Records" FontSize="11"
+                                   Foreground="#71717A" Margin="0 3 0 0"
+                                   FontFamily="Segoe UI Variable Display, Segoe UI"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Footer -->
+                <Border DockPanel.Dock="Bottom"
+                        Padding="6 8" BorderThickness="0 1 0 0" BorderBrush="#E4E4E7">
+                    <Button Style="{StaticResource BackNavButton}"
+                            Command="{Binding DataContext.NavigateCommand,
+                                RelativeSource={RelativeSource FindAncestor,
+                                AncestorType={x:Type dashboardViews:DashboardView}}}"
+                            CommandParameter="Home">
+                        <StackPanel Orientation="Horizontal">
+                            <md:PackIcon Kind="ArrowLeft" Width="15" Height="15"
+                                         Margin="0 0 8 0" VerticalAlignment="Center"
+                                         Foreground="#EF4444"/>
+                            <TextBlock Text="Back to Dashboard" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Border>
+
+                <!-- Nav items -->
+                <StackPanel Margin="0 8 0 0">
+                    <TextBlock Text="MISSING REPORTS" FontSize="10" FontWeight="Bold"
+                               Foreground="#A1A1AA" Margin="16 10 0 4"
+                               FontFamily="Segoe UI Variable Display, Segoe UI"/>
+
+                    <Button Style="{StaticResource SubNavButton}"
+                            Command="{Binding NavigateCommand}" CommandParameter="MissingInternalEntry">
+                        <StackPanel Orientation="Horizontal">
+                            <md:PackIcon Kind="ClipboardAlert" Width="15" Height="15"
+                                         Margin="0 0 10 0" VerticalAlignment="Center" Foreground="#F97316"/>
+                            <TextBlock Text="Missing Internal Entry" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource SubNavButton}"
+                            Command="{Binding NavigateCommand}" CommandParameter="MissingExternalEntry">
+                        <StackPanel Orientation="Horizontal">
+                            <md:PackIcon Kind="ClipboardAlertOutline" Width="15" Height="15"
+                                         Margin="0 0 10 0" VerticalAlignment="Center" Foreground="#EF4444"/>
+                            <TextBlock Text="Missing External Entry" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource SubNavButton}"
+                            Command="{Binding NavigateCommand}" CommandParameter="MissingConvertEntry">
+                        <StackPanel Orientation="Horizontal">
+                            <md:PackIcon Kind="SwapHorizontal" Width="15" Height="15"
+                                         Margin="0 0 10 0" VerticalAlignment="Center" Foreground="#3B82F6"/>
+                            <TextBlock Text="Missing Convert Mark" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource SubNavButton}"
+                            Command="{Binding NavigateCommand}" CommandParameter="MissingResultEntry">
+                        <StackPanel Orientation="Horizontal">
+                            <md:PackIcon Kind="FileQuestion" Width="15" Height="15"
+                                         Margin="0 0 10 0" VerticalAlignment="Center" Foreground="#7C3AED"/>
+                            <TextBlock Text="Missing Result Entry" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- ── Content Area ─────────────────────────────────── -->
+        <ContentControl Grid.Column="1" Content="{Binding CurrentView}" Margin="28 24"/>
+    </Grid>
+</UserControl>

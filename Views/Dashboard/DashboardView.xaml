@@ -1,0 +1,609 @@
+<UserControl x:Class="ACGCET_Admin.Views.Dashboard.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewmodels="clr-namespace:ACGCET_Admin.ViewModels.Dashboard"
+             xmlns:appViewModels="clr-namespace:ACGCET_Admin.ViewModels.Application"
+             xmlns:appViews="clr-namespace:ACGCET_Admin.Views.Application"
+             xmlns:adminViewModels="clr-namespace:ACGCET_Admin.ViewModels.AdminControl"
+             xmlns:adminViews="clr-namespace:ACGCET_Admin.Views.AdminControl"
+             xmlns:missingViewModels="clr-namespace:ACGCET_Admin.ViewModels.MissingEntry"
+             xmlns:missingViews="clr-namespace:ACGCET_Admin.Views.MissingEntry"
+             xmlns:deleteEntry="clr-namespace:ACGCET_Admin.ViewModels.DeleteEntry"
+             xmlns:deleteViews="clr-namespace:ACGCET_Admin.Views.DeleteEntry"
+             xmlns:entryReports="clr-namespace:ACGCET_Admin.ViewModels.EntryReport"
+             xmlns:entryReportViews="clr-namespace:ACGCET_Admin.Views.EntryReport"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=viewmodels:DashboardViewModel}"
+             d:DesignHeight="700" d:DesignWidth="1100">
+
+    <UserControl.Resources>
+
+        <!-- ── DataTemplates ─────────────────────────────────── -->
+        <DataTemplate DataType="{x:Type viewmodels:HomeViewModel}">
+            <Grid>
+
+                <!-- ══ SKELETON (loading) ══════════════════════════════ -->
+                <StackPanel Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+
+                    <!-- KPI skeletons -->
+                    <UniformGrid Columns="5" Margin="0 0 0 16">
+                        <Border Background="White" BorderThickness="1" BorderBrush="#E4E4E7" Margin="0 0 12 0">
+                            <StackPanel Margin="16 14">
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="12" Width="110" HorizontalAlignment="Left" Margin="0 0 0 14"/>
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="26" Width="64"  HorizontalAlignment="Left" Margin="0 0 0 10"/>
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="10" Width="80"  HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="White" BorderThickness="1" BorderBrush="#E4E4E7" Margin="0 0 12 0">
+                            <StackPanel Margin="16 14">
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="12" Width="110" HorizontalAlignment="Left" Margin="0 0 0 14"/>
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="26" Width="64"  HorizontalAlignment="Left" Margin="0 0 0 10"/>
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="10" Width="80"  HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="White" BorderThickness="1" BorderBrush="#E4E4E7" Margin="0 0 12 0">
+                            <StackPanel Margin="16 14">
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="12" Width="110" HorizontalAlignment="Left" Margin="0 0 0 14"/>
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="26" Width="64"  HorizontalAlignment="Left" Margin="0 0 0 10"/>
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="10" Width="80"  HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="White" BorderThickness="1" BorderBrush="#E4E4E7" Margin="0 0 12 0">
+                            <StackPanel Margin="16 14">
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="12" Width="110" HorizontalAlignment="Left" Margin="0 0 0 14"/>
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="26" Width="64"  HorizontalAlignment="Left" Margin="0 0 0 10"/>
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="10" Width="80"  HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="White" BorderThickness="1" BorderBrush="#E4E4E7">
+                            <StackPanel Margin="16 14">
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="12" Width="110" HorizontalAlignment="Left" Margin="0 0 0 14"/>
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="26" Width="64"  HorizontalAlignment="Left" Margin="0 0 0 10"/>
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="10" Width="80"  HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
+
+                    <!-- Middle row skeletons -->
+                    <Grid Margin="0 0 0 16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="252"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Background="White" BorderThickness="1" BorderBrush="#E4E4E7">
+                            <StackPanel Margin="16 14">
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="14" Width="120" HorizontalAlignment="Left" Margin="0 0 0 14"/>
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="32" Margin="0 0 0 4"/>
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="32" Margin="0 0 0 4"/>
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="32" Margin="0 0 0 4"/>
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="32" Margin="0 0 0 4"/>
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="32"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="2" Background="White" BorderThickness="1" BorderBrush="#E4E4E7">
+                            <StackPanel Margin="12 14">
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="14" Width="140" HorizontalAlignment="Left" Margin="0 0 0 14"/>
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="40" Margin="0 0 0 6"/>
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="40" Margin="0 0 0 6"/>
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="40" Margin="0 0 0 6"/>
+                                <ContentControl Style="{StaticResource SkeletonShimmer}" Height="40"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Activity log skeleton -->
+                    <Border Background="White" BorderThickness="1" BorderBrush="#E4E4E7">
+                        <StackPanel Margin="16 12">
+                            <ContentControl Style="{StaticResource SkeletonShimmer}" Height="14" Width="140" HorizontalAlignment="Left" Margin="0 0 0 14"/>
+                            <ContentControl Style="{StaticResource SkeletonShimmer}" Height="34" Margin="0 0 0 3"/>
+                            <ContentControl Style="{StaticResource SkeletonShimmer}" Height="34" Margin="0 0 0 3"/>
+                            <ContentControl Style="{StaticResource SkeletonShimmer}" Height="34" Margin="0 0 0 3"/>
+                            <ContentControl Style="{StaticResource SkeletonShimmer}" Height="34" Margin="0 0 0 3"/>
+                            <ContentControl Style="{StaticResource SkeletonShimmer}" Height="34" Margin="0 0 0 3"/>
+                            <ContentControl Style="{StaticResource SkeletonShimmer}" Height="34" Margin="0 0 0 3"/>
+                            <ContentControl Style="{StaticResource SkeletonShimmer}" Height="34" Margin="0 0 0 3"/>
+                            <ContentControl Style="{StaticResource SkeletonShimmer}" Height="34" Margin="0 0 0 3"/>
+                            <ContentControl Style="{StaticResource SkeletonShimmer}" Height="34" Margin="0 0 0 3"/>
+                            <ContentControl Style="{StaticResource SkeletonShimmer}" Height="34"/>
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+
+                <!-- ══ REAL CONTENT ════════════════════════════════════ -->
+                <StackPanel Visibility="{Binding IsNotLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+
+                    <!-- ── ROW 1: KPI CARDS ─────────────────────────── -->
+                    <UniformGrid Columns="5" Margin="0 0 0 16">
+
+                        <Border Background="White" BorderThickness="1" BorderBrush="#E4E4E7" Margin="0 0 12 0">
+                            <StackPanel Margin="16 14">
+                                <StackPanel Orientation="Horizontal" Margin="0 0 0 8">
+                                    <md:PackIcon Kind="AccountGroup" Width="16" Height="16" Foreground="#71717A" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Total Students" FontSize="12" Foreground="#71717A" Margin="6 0 0 0" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding TotalStudents}" FontSize="26" FontWeight="SemiBold" Foreground="#09090B"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="White" BorderThickness="1" BorderBrush="#E4E4E7" Margin="0 0 12 0">
+                            <StackPanel Margin="16 14">
+                                <StackPanel Orientation="Horizontal" Margin="0 0 0 8">
+                                    <md:PackIcon Kind="ClipboardText" Width="16" Height="16" Foreground="#71717A" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Exam Applications" FontSize="12" Foreground="#71717A" Margin="6 0 0 0" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding TotalApplications}" FontSize="26" FontWeight="SemiBold" Foreground="#09090B"/>
+                                <TextBlock FontSize="11" Foreground="#71717A" Margin="0 4 0 0">
+                                    <Run Text="{Binding PendingApplications, StringFormat={}{0} pending}"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="White" BorderThickness="1" BorderBrush="#E4E4E7" Margin="0 0 12 0">
+                            <StackPanel Margin="16 14">
+                                <StackPanel Orientation="Horizontal" Margin="0 0 0 8">
+                                    <md:PackIcon Kind="CheckCircle" Width="16" Height="16" Foreground="#22C55E" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Passed Results" FontSize="12" Foreground="#71717A" Margin="6 0 0 0" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding TotalPassedResults}" FontSize="26" FontWeight="SemiBold" Foreground="#09090B"/>
+                                <TextBlock FontSize="11" Foreground="#EF4444" Margin="0 4 0 0">
+                                    <Run Text="{Binding TotalFailedResults, StringFormat={}{0} failed}"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="White" BorderThickness="1" BorderBrush="#E4E4E7" Margin="0 0 12 0">
+                            <StackPanel Margin="16 14">
+                                <StackPanel Orientation="Horizontal" Margin="0 0 0 8">
+                                    <md:PackIcon Kind="FileAlertOutline" Width="16" Height="16" Foreground="#F97316" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Missing Internal" FontSize="12" Foreground="#71717A" Margin="6 0 0 0" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding MissingInternalCount}" FontSize="26" FontWeight="SemiBold" Foreground="#09090B"/>
+                                <TextBlock FontSize="11" Foreground="#71717A" Margin="0 4 0 0">
+                                    <Run Text="{Binding MissingExternalCount, StringFormat={}{0} ext. missing}"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="White" BorderThickness="1" BorderBrush="#E4E4E7">
+                            <StackPanel Margin="16 14">
+                                <StackPanel Orientation="Horizontal" Margin="0 0 0 8">
+                                    <md:PackIcon Kind="FileRefresh" Width="16" Height="16" Foreground="#71717A" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Revaluations" FontSize="12" Foreground="#71717A" Margin="6 0 0 0" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding PendingRevaluations}" FontSize="26" FontWeight="SemiBold" Foreground="#09090B"/>
+                                <TextBlock Text="pending" FontSize="11" Foreground="#71717A" Margin="0 4 0 0"/>
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
+
+                    <!-- ── ROW 2: ALERTS + MODULE STATUS ───────────── -->
+                    <Grid Margin="0 0 0 16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="252"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- System Alerts -->
+                        <Border Grid.Column="0" Background="White" BorderThickness="1" BorderBrush="#E4E4E7">
+                            <DockPanel>
+                                <Border DockPanel.Dock="Top" Padding="16 10" BorderThickness="0 0 0 1" BorderBrush="#E4E4E7">
+                                    <StackPanel Orientation="Horizontal">
+                                        <md:PackIcon Kind="Bell" Width="15" Height="15" Foreground="#7C3AED" VerticalAlignment="Center"/>
+                                        <TextBlock Text="System Alerts" FontSize="13" FontWeight="SemiBold"
+                                                   Foreground="#09090B" VerticalAlignment="Center" Margin="8 0 0 0"
+                                                   FontFamily="Segoe UI Variable Display, Segoe UI"/>
+                                    </StackPanel>
+                                </Border>
+                                <DataGrid ItemsSource="{Binding RecentAlerts}"
+                                          AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
+                                          MaxHeight="200" BorderThickness="0"
+                                          RowBackground="White" AlternatingRowBackground="#F5F3FF"
+                                          HeadersVisibility="Column" GridLinesVisibility="Horizontal"
+                                          HorizontalGridLinesBrush="#EDE9FE"
+                                          ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                    <DataGrid.Columns>
+                                        <DataGridTemplateColumn Header="Severity" Width="110" SortMemberPath="AlertSeverity">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Border Padding="6 2" HorizontalAlignment="Left" Margin="6 2"
+                                                            Background="{Binding AlertSeverity, Converter={StaticResource SeverityToBgConverter}}">
+                                                        <TextBlock Text="{Binding AlertSeverity}" FontSize="11" FontWeight="Medium"
+                                                                   Foreground="{Binding AlertSeverity, Converter={StaticResource SeverityToFgConverter}}"/>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTextColumn Header="Date"    Binding="{Binding AlertDateTime, StringFormat={}{0:dd/MM/yy HH:mm}}" Width="120"/>
+                                        <DataGridTextColumn Header="Message" Binding="{Binding AlertMessage}" Width="*"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </DockPanel>
+                        </Border>
+
+                        <!-- Module Lock Status -->
+                        <Border Grid.Column="2" Background="White" BorderThickness="1" BorderBrush="#E4E4E7">
+                            <DockPanel>
+                                <Border DockPanel.Dock="Top" Padding="16 10" BorderThickness="0 0 0 1" BorderBrush="#E4E4E7">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <md:PackIcon Kind="Lock" Width="15" Height="15" Foreground="#71717A" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Module Lock Status" FontSize="13" FontWeight="SemiBold"
+                                                       Foreground="#09090B" VerticalAlignment="Center" Margin="8 0 0 0"/>
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding LatestExamLabel, StringFormat='Exam: {0}'}"
+                                                   FontSize="11" Foreground="#71717A" Margin="23 3 0 0"/>
+                                    </StackPanel>
+                                </Border>
+                                <ItemsControl ItemsSource="{Binding ModuleLockStatuses}" Margin="10 8">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Margin="0 3" Padding="10 8"
+                                                    BorderThickness="1"
+                                                    BorderBrush="{Binding IsLocked, Converter={StaticResource LockToFgConverter}}"
+                                                    Background="{Binding IsLocked, Converter={StaticResource LockToBgConverter}}">
+                                                <DockPanel>
+                                                    <md:PackIcon DockPanel.Dock="Left" Kind="Lock"
+                                                                 Width="14" Height="14" VerticalAlignment="Center"
+                                                                 Foreground="{Binding IsLocked, Converter={StaticResource LockToFgConverter}}"
+                                                                 Visibility="{Binding IsLocked, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                                    <md:PackIcon DockPanel.Dock="Left" Kind="LockOpen"
+                                                                 Width="14" Height="14" VerticalAlignment="Center"
+                                                                 Foreground="{Binding IsLocked, Converter={StaticResource LockToFgConverter}}"
+                                                                 Visibility="{Binding IsLocked, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                                    <TextBlock DockPanel.Dock="Right"
+                                                               Text="{Binding StatusLabel}" FontSize="10" FontWeight="SemiBold"
+                                                               Foreground="{Binding IsLocked, Converter={StaticResource LockToFgConverter}}"
+                                                               VerticalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding ModuleName}" FontSize="12" FontWeight="Medium"
+                                                               Foreground="#09090B" VerticalAlignment="Center" Margin="8 0"/>
+                                                </DockPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </DockPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- ── ROW 3: RECENT ACTIVITY (PAGINATED) ──────── -->
+                    <Border Background="White" BorderThickness="1" BorderBrush="#E4E4E7">
+                        <DockPanel>
+                            <!-- Card header: title + refresh only -->
+                            <Border DockPanel.Dock="Top" Padding="16 11" BorderThickness="0 0 0 1" BorderBrush="#E4E4E7">
+                                <DockPanel>
+                                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                                        <md:PackIcon Kind="History" Width="15" Height="15" Foreground="#7C3AED" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Recent Activity" FontSize="13" FontWeight="SemiBold"
+                                                   Foreground="#09090B" VerticalAlignment="Center" Margin="8 0 0 0"
+                                                   FontFamily="Segoe UI Variable Display, Segoe UI"/>
+                                    </StackPanel>
+                                    <!-- Refresh button top-right -->
+                                    <Button DockPanel.Dock="Right"
+                                            Command="{Binding RefreshCommand}"
+                                            Style="{StaticResource MaterialDesignOutlinedButton}"
+                                            md:ButtonAssist.CornerRadius="0"
+                                            Width="36" Height="28" Padding="0"
+                                            BorderBrush="#E4E4E7" Foreground="#7C3AED"
+                                            ToolTip="Refresh dashboard data">
+                                        <md:PackIcon Kind="Refresh" Width="14" Height="14"/>
+                                    </Button>
+                                </DockPanel>
+                            </Border>
+
+                            <!-- Pagination footer -->
+                            <Border DockPanel.Dock="Bottom" Padding="16 8" BorderThickness="0 1 0 0" BorderBrush="#E4E4E7">
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Left" Text="{Binding LogsPageInfo}"
+                                               FontSize="12" Foreground="#71717A" VerticalAlignment="Center"/>
+                                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Button Content="← Prev" Command="{Binding PrevLogsPageCommand}"
+                                                IsEnabled="{Binding CanGoPrevLogs}"
+                                                Style="{StaticResource MaterialDesignOutlinedButton}"
+                                                md:ButtonAssist.CornerRadius="0"
+                                                Height="28" Padding="10 0" Margin="0 0 6 0"
+                                                BorderBrush="#E4E4E7" Foreground="#52525B" FontSize="12"/>
+                                        <Button Content="Next →" Command="{Binding NextLogsPageCommand}"
+                                                IsEnabled="{Binding CanGoNextLogs}"
+                                                Style="{StaticResource MaterialDesignOutlinedButton}"
+                                                md:ButtonAssist.CornerRadius="0"
+                                                Height="28" Padding="10 0"
+                                                BorderBrush="#E4E4E7" Foreground="#52525B" FontSize="12"/>
+                                    </StackPanel>
+                                </DockPanel>
+                            </Border>
+
+                            <!-- Audit log DataGrid (scrollable) -->
+                            <DataGrid ItemsSource="{Binding RecentLogs}"
+                                      AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
+                                      BorderThickness="0" MaxHeight="320"
+                                      RowBackground="White" AlternatingRowBackground="#F5F3FF"
+                                      HeadersVisibility="Column" GridLinesVisibility="Horizontal"
+                                      HorizontalGridLinesBrush="#EDE9FE"
+                                      ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Date"   Binding="{Binding ActionDate, StringFormat={}{0:dd/MM/yy HH:mm}}" Width="130"/>
+                                    <DataGridTextColumn Header="User"   Binding="{Binding AdminUserId}" Width="55"/>
+                                    <DataGridTemplateColumn Header="Action" Width="160" SortMemberPath="ActionType">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border Padding="6 2" HorizontalAlignment="Left" Margin="6 2"
+                                                        Background="{Binding ActionType, Converter={StaticResource ActionTypeToBgConverter}}">
+                                                    <TextBlock Text="{Binding ActionType}" FontSize="11" FontWeight="Medium"
+                                                               Foreground="{Binding ActionType, Converter={StaticResource ActionTypeToFgConverter}}"/>
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="Table"       Binding="{Binding TableName}" Width="130"/>
+                                    <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                    </Border>
+
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type appViewModels:ApplicationViewModel}">
+            <appViews:ApplicationView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type adminViewModels:AdminControlViewModel}">
+            <adminViews:AdminControlView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type missingViewModels:MissingEntryViewModel}">
+            <missingViews:MissingEntryView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type deleteEntry:DeleteEntryViewModel}">
+            <deleteViews:DeleteEntryView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type entryReports:EntryReportViewModel}">
+            <entryReportViews:EntryReportView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type adminViewModels:UserManagementViewModel}">
+            <adminViews:UserManagementView/>
+        </DataTemplate>
+
+        <!-- ── Nav Item Style (ShadCN ghost, purple hover) ──── -->
+        <Style x:Key="NavItemStyle" TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="6 2"/>
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="Padding" Value="12 0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="md:ButtonAssist.CornerRadius" Value="0"/>
+            <Setter Property="Foreground" Value="#52525B"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="FontFamily" Value="Segoe UI Variable Display, Segoe UI"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F5F3FF"/>
+                    <Setter Property="Foreground" Value="#7C3AED"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+    </UserControl.Resources>
+
+    <DockPanel Background="#FAFAFA">
+
+        <!-- ── SIDEBAR (animated width) ──────────────────────── -->
+        <Border DockPanel.Dock="Left" Background="White"
+                BorderThickness="0 0 1 0" BorderBrush="#E4E4E7"
+                ClipToBounds="True">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Width" Value="264"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsDrawerOpen}" Value="False">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Width"
+                                                         To="0" Duration="0:0:0.22">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Width"
+                                                         To="264" Duration="0:0:0.22">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+
+            <DockPanel>
+                <!-- Brand -->
+                <Border DockPanel.Dock="Top" BorderThickness="0 0 0 1" BorderBrush="#E4E4E7" Padding="16 18">
+                    <DockPanel>
+                        <Image Source="pack://application:,,,/Resources/Images/acgcet_logo.png"
+                               Width="36" Height="36" DockPanel.Dock="Left" VerticalAlignment="Center"
+                               RenderOptions.BitmapScalingMode="HighQuality"
+                               HorizontalAlignment="Left"/>
+                        <StackPanel Margin="12 0 0 0" VerticalAlignment="Center">
+                            <TextBlock Text="ACGCET" FontSize="15" FontWeight="Bold" Foreground="#09090B"
+                                       FontFamily="Segoe UI Variable Display, Segoe UI"/>
+                            <TextBlock Text="Admin Portal" FontSize="12" Foreground="#7C3AED"
+                                       FontFamily="Segoe UI Variable Display, Segoe UI"/>
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+
+                <!-- Footer -->
+                <Border DockPanel.Dock="Bottom" BorderThickness="0 1 0 0" BorderBrush="#E4E4E7" Padding="10 10">
+                    <StackPanel>
+                        <!-- User info -->
+                        <StackPanel Orientation="Horizontal" Margin="4 0 4 10">
+                            <Border Width="30" Height="30" Background="#09090B">
+                                <TextBlock Text="{Binding UserInitials}" FontSize="11" FontWeight="SemiBold"
+                                           Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Margin="8 0 0 0" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding UserDisplayName}" FontSize="12" FontWeight="Medium"
+                                           Foreground="#09090B" MaxWidth="148" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding UserRoleLabel}" FontSize="10" Foreground="#71717A"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <Button Command="{Binding LogoutCommand}"
+                                Height="34" Margin="2 0"
+                                HorizontalContentAlignment="Left" HorizontalAlignment="Stretch"
+                                Padding="10 0" BorderThickness="0"
+                                md:ButtonAssist.CornerRadius="0"
+                                Style="{StaticResource MaterialDesignFlatButton}"
+                                Foreground="#EF4444">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="Logout" Width="15" Height="15" Margin="0 0 8 0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Log out" VerticalAlignment="Center" FontSize="13"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Click="Button_Click" Style="{StaticResource NavItemStyle}" Height="34" Margin="2 0">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="Close" Width="15" Height="15" Margin="0 0 8 0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Close App" VerticalAlignment="Center" FontSize="13"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+
+                <!-- Navigation -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0 6 0 0">
+
+                        <TextBlock Text="MENU" FontSize="10" FontWeight="Bold"
+                                   Foreground="#A1A1AA" Margin="16 12 0 4"
+                                   FontFamily="Segoe UI Variable Display, Segoe UI"/>
+
+                        <Button Style="{StaticResource NavItemStyle}"
+                                Command="{Binding NavigateCommand}" CommandParameter="Home">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="ViewDashboard" Width="18" Height="18" Margin="0 0 12 0"
+                                             VerticalAlignment="Center" Foreground="#7C3AED"/>
+                                <TextBlock Text="Dashboard" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource NavItemStyle}"
+                                Command="{Binding NavigateCommand}" CommandParameter="Application">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="FileChartOutline" Width="18" Height="18" Margin="0 0 12 0"
+                                             VerticalAlignment="Center" Foreground="#3B82F6"/>
+                                <TextBlock Text="Applications" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource NavItemStyle}"
+                                Command="{Binding NavigateCommand}" CommandParameter="AdminControl">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="AccountCog" Width="18" Height="18" Margin="0 0 12 0"
+                                             VerticalAlignment="Center" Foreground="#22C55E"/>
+                                <TextBlock Text="Admin Control" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource NavItemStyle}"
+                                Command="{Binding NavigateCommand}" CommandParameter="MissingEntry">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="FileAlertOutline" Width="18" Height="18" Margin="0 0 12 0"
+                                             VerticalAlignment="Center" Foreground="#F97316"/>
+                                <TextBlock Text="Missing Entries" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource NavItemStyle}"
+                                Command="{Binding NavigateCommand}" CommandParameter="DeleteEntry">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="DeleteForever" Width="18" Height="18" Margin="0 0 12 0"
+                                             VerticalAlignment="Center" Foreground="#EF4444"/>
+                                <TextBlock Text="Delete Entries" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource NavItemStyle}"
+                                Command="{Binding NavigateCommand}" CommandParameter="EntryReport">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="ChartBox" Width="18" Height="18" Margin="0 0 12 0"
+                                             VerticalAlignment="Center" Foreground="#7C3AED"/>
+                                <TextBlock Text="Entry Reports" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- User Management (COE only) -->
+                        <Border Height="1" Background="#E4E4E7" Margin="12 10"
+                                Visibility="{Binding CanManageUsers, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        <TextBlock Text="ADMIN" FontSize="10" FontWeight="Bold"
+                                   Foreground="#A1A1AA" Margin="16 0 0 4"
+                                   FontFamily="Segoe UI Variable Display, Segoe UI"
+                                   Visibility="{Binding CanManageUsers, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        <Button Style="{StaticResource NavItemStyle}"
+                                Command="{Binding NavigateCommand}" CommandParameter="UserManagement"
+                                Visibility="{Binding CanManageUsers, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="AccountMultiple" Width="18" Height="18" Margin="0 0 12 0"
+                                             VerticalAlignment="Center" Foreground="#7C3AED"/>
+                                <TextBlock Text="User Management" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <!-- ── MAIN BODY ──────────────────────────────────────── -->
+        <DockPanel>
+
+            <!-- Top Bar -->
+            <Border DockPanel.Dock="Top" Background="White" Height="52"
+                    BorderThickness="0 0 0 1" BorderBrush="#E4E4E7"
+                    Padding="14 0">
+                <DockPanel>
+                    <!-- Hamburger -->
+                    <ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}"
+                                  IsChecked="{Binding IsDrawerOpen}"
+                                  DockPanel.Dock="Left" Margin="0 0 12 0"
+                                  Foreground="#52525B"/>
+
+                    <!-- Right: user + role badge -->
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
+                                VerticalAlignment="Center" Margin="0 0 2 0">
+                        <TextBlock Text="{Binding UserDisplayName}" FontSize="13"
+                                   Foreground="#52525B" VerticalAlignment="Center" Margin="0 0 10 0"/>
+                        <!-- ShadCN outline badge -->
+                        <Border BorderThickness="1" BorderBrush="#E4E4E7"
+                                Padding="10 4" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding UserRoleLabel}" FontSize="11"
+                                       FontWeight="Medium" Foreground="#09090B"/>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Page Title -->
+                    <TextBlock Text="{Binding WelcomeMessage}"
+                               VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold"
+                               Foreground="#09090B"/>
+                </DockPanel>
+            </Border>
+
+            <!-- Content Area — no outer ScrollViewer; each sub-view manages its own scrolling -->
+            <ContentControl Content="{Binding CurrentView}" Margin="28 24"/>
+
+        </DockPanel>
+    </DockPanel>
+</UserControl>

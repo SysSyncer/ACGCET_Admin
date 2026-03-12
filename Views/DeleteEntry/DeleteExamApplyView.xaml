@@ -1,0 +1,83 @@
+﻿<UserControl x:Class="ACGCET_Admin.Views.DeleteEntry.DeleteExamApplyView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewmodels="clr-namespace:ACGCET_Admin.ViewModels.DeleteEntry"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=viewmodels:DeleteExamApplyViewModel}"
+             d:DesignHeight="700" d:DesignWidth="1024">
+
+    <Grid Background="Transparent" Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Form -->
+        <Grid Grid.Row="0" Margin="0 0 0 16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="250"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Row 1 -->
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Exam Time" VerticalAlignment="Center" FontWeight="SemiBold"/>
+            <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding ExamSessions}" SelectedItem="{Binding SelectedSession}" DisplayMemberPath="SessionName" Margin="0 4"/>
+
+            <TextBlock Grid.Row="0" Grid.Column="3" Text="Reg No" VerticalAlignment="Center" FontWeight="SemiBold"/>
+            <TextBox Grid.Row="0" Grid.Column="4" Text="{Binding RegNo, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MaterialDesignOutlinedTextBox}" Margin="0 4"/>
+
+            <!-- Row 2 -->
+             <TextBlock Grid.Row="1" Grid.Column="0" Text="Admission No" VerticalAlignment="Center" FontWeight="SemiBold"/>
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding AdmissionNo}" IsReadOnly="True" Style="{StaticResource MaterialDesignOutlinedTextBox}" Margin="0 4"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="3" Text="Roll No" VerticalAlignment="Center" FontWeight="SemiBold"/>
+            <TextBox Grid.Row="1" Grid.Column="4" Text="{Binding RollNo}" IsReadOnly="True" Style="{StaticResource MaterialDesignOutlinedTextBox}" Margin="0 4"/>
+            
+             <!-- Row 3 -->
+             <TextBlock Grid.Row="2" Grid.Column="0" Text="Student Name" VerticalAlignment="Center" FontWeight="SemiBold"/>
+            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding StudentName}" IsReadOnly="True" Style="{StaticResource MaterialDesignOutlinedTextBox}" Margin="0 4"/>
+             
+            <TextBlock Grid.Row="2" Grid.Column="3" Text="Program Name" VerticalAlignment="Center" FontWeight="SemiBold"/>
+            <TextBox Grid.Row="2" Grid.Column="4" Text="{Binding ProgramName}" IsReadOnly="True" Style="{StaticResource MaterialDesignOutlinedTextBox}" Margin="0 4"/>
+            
+            <!-- Row 4 -->
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Batch" VerticalAlignment="Center" FontWeight="SemiBold"/>
+            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Batch}" IsReadOnly="True" Style="{StaticResource MaterialDesignOutlinedTextBox}" Margin="0 4"/>
+            
+            <TextBlock Grid.Row="3" Grid.Column="3" Text="Section" VerticalAlignment="Center" FontWeight="SemiBold"/>
+            <TextBox Grid.Row="3" Grid.Column="4" Text="{Binding Section}" IsReadOnly="True" Style="{StaticResource MaterialDesignOutlinedTextBox}" Margin="0 4"/>
+
+        </Grid>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0 0 0 16">
+            <Button Content="View" Command="{Binding SearchCommand}" Margin="8 0" Width="100"/>
+            <Button Content="Delete" Command="{Binding DeleteCommand}" Margin="8 0" Width="100" Background="Red" BorderBrush="Red"/>
+            <Button Content="Clear" Command="{Binding ClearCommand}" Margin="8 0" Width="100" Style="{StaticResource SubtleButton}"/>
+            <Button Command="{Binding RefreshCommand}" Style="{StaticResource IconButton}" ToolTip="Refresh" Margin="8 0 0 0">
+                <materialDesign:PackIcon Kind="Refresh" Width="14" Height="14"/>
+            </Button>
+        </StackPanel>
+
+        <!-- Grid -->
+        <DataGrid Grid.Row="1" ItemsSource="{Binding PaperList}" AutoGenerateColumns="False" CanUserAddRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Subject Code" Binding="{Binding PaperCode}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Subject Name" Binding="{Binding PaperName}" Width="*" IsReadOnly="True"/>
+                <DataGridCheckBoxColumn Header="Select" Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

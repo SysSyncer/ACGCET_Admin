@@ -1,0 +1,114 @@
+﻿<UserControl x:Class="ACGCET_Admin.Views.Application.TimetablePrintView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewmodels="clr-namespace:ACGCET_Admin.ViewModels.Application"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=viewmodels:TimetablePrintViewModel}"
+             d:DesignHeight="700" d:DesignWidth="1024">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <Grid Background="Transparent" Margin="16">
+        <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
+                     IsIndeterminate="True" Value="0" Width="50" Height="50"
+                     Panel.ZIndex="100" VerticalAlignment="Center" HorizontalAlignment="Center"
+                     Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+        <Grid IsEnabled="{Binding IsNotLoading}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Filters -->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.Resources>
+                     <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignBody2TextBlock}">
+                         <Setter Property="VerticalAlignment" Value="Center"/>
+                         <Setter Property="Margin" Value="0 0 16 0"/>
+                         <Setter Property="FontWeight" Value="Bold"/>
+                     </Style>
+                     <Style TargetType="ComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
+                         <Setter Property="Margin" Value="0 4"/>
+                         <Setter Property="Width" Value="200"/>
+                         <Setter Property="HorizontalAlignment" Value="Left"/>
+                     </Style>
+                 </Grid.Resources>
+
+                 <!-- Left Column -->
+                 <StackPanel Grid.Column="0" Grid.ColumnSpan="2">
+                     <Grid>
+                         <Grid.ColumnDefinitions>
+                             <ColumnDefinition Width="120"/>
+                             <ColumnDefinition Width="*"/>
+                         </Grid.ColumnDefinitions>
+                         <Grid.RowDefinitions>
+                             <RowDefinition Height="Auto"/>
+                             <RowDefinition Height="Auto"/>
+                             <RowDefinition Height="Auto"/>
+                         </Grid.RowDefinitions>
+
+                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Exam Time"/>
+                         <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Examinations}" SelectedItem="{Binding SelectedExamination}"/>
+
+                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Course Level"/>
+                         <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Levels}" SelectedItem="{Binding SelectedLevel}"/>
+
+                         <TextBlock Grid.Row="2" Grid.Column="0" Text="Program Name"/>
+                         <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding Programs}" SelectedItem="{Binding SelectedProgram}" Width="300"/>
+                     </Grid>
+                 </StackPanel>
+
+                 <!-- Right Column -->
+                 <StackPanel Grid.Column="2" Grid.ColumnSpan="2" Margin="32 0 0 0">
+                     <Grid>
+                         <Grid.ColumnDefinitions>
+                             <ColumnDefinition Width="120"/>
+                             <ColumnDefinition Width="*"/>
+                         </Grid.ColumnDefinitions>
+                         <Grid.RowDefinitions>
+                             <RowDefinition Height="Auto"/>
+                         </Grid.RowDefinitions>
+                         
+                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Batch/Reg"/>
+                         <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Regulations}" SelectedItem="{Binding SelectedRegulation}"/>
+                     </Grid>
+                 </StackPanel>
+            </Grid>
+
+            <!-- Actions -->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 16">
+                <Button Command="{Binding ViewTimetableCommand}" Content="VIEW" Style="{StaticResource PrimaryButton}" Width="80" Margin="4"/>
+                <Button Command="{Binding PrintPreviewCommand}" Content="PREVIEW" Style="{StaticResource SubtleButton}" Width="100" Margin="4"/>
+                <Button Command="{Binding PrintCommand}" Content="PRINT" Style="{StaticResource SubtleButton}" Width="80" Margin="4"/>
+                <Button Command="{Binding ClearFiltersCommand}" Content="CLEAR" Style="{StaticResource SubtleButton}" Width="80" Margin="4"/>
+                <Button Command="{Binding RefreshCommand}" Style="{StaticResource IconButton}" ToolTip="Refresh" Margin="8 0 0 0">
+                    <materialDesign:PackIcon Kind="Refresh" Width="14" Height="14"/>
+                </Button>
+            </StackPanel>
+
+            <!-- DataGrid -->
+            <DataGrid Grid.Row="2" ItemsSource="{Binding TimetableData}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding Date}" Header="Date"/>
+                    <DataGridTextColumn Binding="{Binding Session}" Header="Session"/>
+                    <DataGridTextColumn Binding="{Binding CourseCode}" Header="Course Code"/>
+                    <DataGridTextColumn Binding="{Binding CourseTitle}" Header="Course Title" Width="*"/>
+                    <DataGridTextColumn Binding="{Binding SemesterDisplay}" Header="Sem"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Grid>
+</UserControl>

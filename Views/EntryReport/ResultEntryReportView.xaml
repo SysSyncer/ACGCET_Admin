@@ -1,0 +1,58 @@
+﻿<UserControl x:Class="ACGCET_Admin.Views.EntryReport.ResultEntryReportView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewmodels="clr-namespace:ACGCET_Admin.ViewModels.EntryReport"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=viewmodels:ResultEntryReportViewModel}"
+             d:DesignHeight="700" d:DesignWidth="1024">
+    <Grid Background="Transparent" Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Margin="0 0 0 16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Course Level" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0 0 16 0"/>
+            <ComboBox Grid.Column="1" ItemsSource="{Binding CourseLevels}" SelectedItem="{Binding SelectedCourseLevel}"/>
+            <TextBlock Grid.Column="3" Text="Program" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0 0 16 0"/>
+            <ComboBox Grid.Column="4" ItemsSource="{Binding Programs}" SelectedItem="{Binding SelectedProgram}" DisplayMemberPath="ProgramName"/>
+            <StackPanel Grid.Column="6" Grid.RowSpan="2" VerticalAlignment="Center">
+                <Button Content="View" Command="{Binding ViewCommand}"  Width="100" Margin="0 0 0 10"/>
+                <Button Content="Preview" Command="{Binding PreviewCommand}" Style="{StaticResource SubtleButton}" Width="100" Margin="0 0 0 10"/>
+                <Button Content="Print" Command="{Binding PrintCommand}" Style="{StaticResource SubtleButton}" Width="100" Margin="0 0 0 10"/>
+                <Button Content="Clear" Command="{Binding ClearCommand}" Style="{StaticResource SubtleButton}" Width="100" Margin="0 0 0 10"/>
+                <Button Command="{Binding RefreshCommand}" Style="{StaticResource IconButton}" ToolTip="Refresh" HorizontalAlignment="Left">
+                    <materialDesign:PackIcon Kind="Refresh" Width="14" Height="14"/>
+                </Button>
+            </StackPanel>
+            <TextBlock Grid.Row="1" Text="Batch" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0 10 0 0"/>
+            <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Batches}" SelectedItem="{Binding SelectedBatch}" DisplayMemberPath="BatchName" Margin="0 10 0 0"/>
+            <TextBlock Grid.Row="1" Grid.Column="3" Text="Section" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0 10 0 0"/>
+            <ComboBox Grid.Row="1" Grid.Column="4" ItemsSource="{Binding Sections}" SelectedItem="{Binding SelectedSection}" DisplayMemberPath="SectionName" Margin="0 10 0 0"/>
+        </Grid>
+        <DataGrid Grid.Row="1" ItemsSource="{Binding ReportData}" AutoGenerateColumns="False" CanUserAddRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Reg. No" Binding="{Binding RegNo}"/>
+                <DataGridTextColumn Header="Student Name" Binding="{Binding StudentName}"/>
+                <DataGridTextColumn Header="Paper Code" Binding="{Binding PaperCode}"/>
+                <DataGridTextColumn Header="Grade" Binding="{Binding Grade}"/>
+                <DataGridTextColumn Header="Entry Person" Binding="{Binding EntryPerson}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

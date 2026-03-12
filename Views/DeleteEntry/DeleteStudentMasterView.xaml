@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="ACGCET_Admin.Views.DeleteEntry.DeleteStudentMasterView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewmodels="clr-namespace:ACGCET_Admin.ViewModels.DeleteEntry"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=viewmodels:DeleteStudentMasterViewModel}"
+             d:DesignHeight="700" d:DesignWidth="1024">
+    <Grid Background="Transparent" Margin="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Reg No" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0 8"/>
+        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Margin="0 8">
+            <TextBox Text="{Binding RegNo, UpdateSourceTrigger=PropertyChanged}" Width="200" Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+            <Button Content="View" Command="{Binding SearchCommand}" Margin="8 0"/>
+        </StackPanel>
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Student Name" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0 8"/>
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding StudentName}" IsReadOnly="True" Margin="0 8" Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Program" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0 8"/>
+        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ProgramName}" IsReadOnly="True" Margin="0 8" Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Batch" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0 8"/>
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Batch}" IsReadOnly="True" Margin="0 8" Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+
+        <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Margin="0 24">
+             <Button Content="DELETE STUDENT" Command="{Binding DeleteCommand}" Background="Red" BorderBrush="Red" Width="150" Margin="0 0 16 0"/>
+             <Button Content="CLEAR" Command="{Binding ClearCommand}" Style="{StaticResource SubtleButton}" Width="100"/>
+             <Button Command="{Binding RefreshCommand}" Style="{StaticResource IconButton}" ToolTip="Refresh" Margin="8 0 0 0">
+                 <materialDesign:PackIcon Kind="Refresh" Width="14" Height="14"/>
+             </Button>
+        </StackPanel>
+    </Grid>
+</UserControl>

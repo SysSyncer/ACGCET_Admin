@@ -1,0 +1,158 @@
+﻿<UserControl x:Class="ACGCET_Admin.Views.Application.ClassWiseStudentsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewmodels="clr-namespace:ACGCET_Admin.ViewModels.Application"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=viewmodels:ClassWiseStudentsViewModel}"
+             d:DesignHeight="700" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <Grid Background="Transparent" Margin="16">
+        <!-- Overlay Loading State -->
+        <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
+                     IsIndeterminate="True"
+                     Value="0"
+                     Width="50" Height="50"
+                     VerticalAlignment="Center" HorizontalAlignment="Center"
+                     Panel.ZIndex="100"
+                     Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+        <Grid IsEnabled="{Binding IsNotLoading}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!-- Filters -->
+                <RowDefinition Height="Auto"/> <!-- Actions -->
+                <RowDefinition Height="*"/>    <!-- DataGrid -->
+                <RowDefinition Height="Auto"/> <!-- Pagination -->
+            </Grid.RowDefinitions>
+
+            <!-- Filters Section -->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="32"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <Grid.Resources>
+                    <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignBody2TextBlock}">
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="Margin" Value="0 0 16 0"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                    </Style>
+                    <Style TargetType="ComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
+                         <Setter Property="Margin" Value="0 4"/>
+                    </Style>
+                </Grid.Resources>
+
+                <!-- Filter Controls -->
+                <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="4">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="UG / PG"/>
+                        <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Levels}" SelectedItem="{Binding SelectedLevel}"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Program Name"/>
+                        <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Programs}" SelectedItem="{Binding SelectedProgram}"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Batch"/>
+                        <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding Batches}" SelectedItem="{Binding SelectedBatch}"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Section"/>
+                        <ComboBox Grid.Row="3" Grid.Column="1" ItemsSource="{Binding Sections}" SelectedItem="{Binding SelectedSection}"/>
+                        
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Order By"/>
+                        <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Margin="0 8 0 0">
+                            <RadioButton Content="Regno" IsChecked="{Binding OrderByRegNo}" Margin="0 0 8 0"/>
+                            <RadioButton Content="Roll No" IsChecked="{Binding OrderByRollNo}" Margin="0 0 8 0"/>
+                            <RadioButton Content="Gender" IsChecked="{Binding OrderByGender}" Margin="0 0 8 0"/>
+                        </StackPanel>
+
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Report Type"/>
+                        <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal" Margin="0 8 0 0">
+                            <RadioButton Content="All Students" IsChecked="{Binding ShowAllStudents}" Margin="0 0 8 0"/>
+                            <RadioButton Content="Missing Reg. No" IsChecked="{Binding ShowMissingRegNo}" Margin="0 0 8 0"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0 8 0 0">
+                             <CheckBox Content="Print Date" Margin="0 0 8 0"/>
+                             <CheckBox Content="Portrait" IsChecked="True" Margin="0 0 8 0"/>
+                             <CheckBox Content="Landscape" Margin="0 0 8 0"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+
+            <!-- Actions Section -->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 0 0 16">
+                <Button Command="{Binding ViewReportCommand}" Content="VIEW" Style="{StaticResource PrimaryButton}" Width="80" Margin="4"/>
+                <Button Command="{Binding PreviewCommand}" Content="PREVIEW" Style="{StaticResource SubtleButton}" Width="80" Margin="4"/>
+                <Button Command="{Binding PrintCommand}" Content="PRINT" Style="{StaticResource SubtleButton}" Width="80" Margin="4"/>
+                <Button Command="{Binding ClearFiltersCommand}" Content="CLEAR" Style="{StaticResource SubtleButton}" Width="80" Margin="4"/>
+                <Button Command="{Binding RefreshCommand}" Style="{StaticResource IconButton}" ToolTip="Refresh" Margin="8 0 0 0">
+                    <materialDesign:PackIcon Kind="Refresh" Width="14" Height="14"/>
+                </Button>
+            </StackPanel>
+
+            <!-- DataGrid -->
+            <DataGrid Grid.Row="2" ItemsSource="{Binding StudentsList}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding StudentId}" Header="SNo" />
+                    <DataGridTextColumn Binding="{Binding AdmissionNumber}" Header="ANo"/>
+                    <DataGridTextColumn Binding="{Binding RollNumber}" Header="Roll No"/>
+                    <DataGridTextColumn Binding="{Binding RegistrationNumber}" Header="Reg. No"/>
+                    <DataGridTextColumn Binding="{Binding FullName}" Header="Student Name" Width="*"/>
+                    <DataGridTextColumn Binding="{Binding RegulationId}" Header="Regulation"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <!-- Pagination Controls -->
+            <Border Grid.Row="3" Padding="8" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0 1 0 0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="Rows per page:" VerticalAlignment="Center" Margin="0 0 8 0"/>
+                        <ComboBox ItemsSource="{Binding PageSizes}" SelectedItem="{Binding SelectedPageSize}" Width="60"/>
+                    </StackPanel>
+
+                    <TextBlock Grid.Column="1" Text="{Binding PageInfo}" VerticalAlignment="Center" Margin="16 0" FontWeight="SemiBold"/>
+
+                    <StackPanel Grid.Column="3" Orientation="Horizontal">
+                        <Button Command="{Binding PreviousPageCommand}" Style="{StaticResource IconButton}" ToolTip="Previous Page">
+                            <materialDesign:PackIcon Kind="ChevronLeft"/>
+                        </Button>
+                        <Button Command="{Binding NextPageCommand}" Style="{StaticResource IconButton}" ToolTip="Next Page">
+                            <materialDesign:PackIcon Kind="ChevronRight"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

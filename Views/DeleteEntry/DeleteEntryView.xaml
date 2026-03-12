@@ -1,0 +1,199 @@
+<UserControl x:Class="ACGCET_Admin.Views.DeleteEntry.DeleteEntryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewmodels="clr-namespace:ACGCET_Admin.ViewModels.DeleteEntry"
+             xmlns:dashboardViews="clr-namespace:ACGCET_Admin.Views.Dashboard"
+             xmlns:views="clr-namespace:ACGCET_Admin.Views.DeleteEntry"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=viewmodels:DeleteEntryViewModel}"
+             d:DesignHeight="700" d:DesignWidth="1100">
+
+    <UserControl.Resources>
+        <DataTemplate DataType="{x:Type viewmodels:DeleteExamApplyViewModel}">
+            <views:DeleteExamApplyView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:DeleteInternalMarkViewModel}">
+            <views:DeleteInternalMarkView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:DeleteExternalMarkViewModel}">
+            <views:DeleteExternalMarkView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:DeleteConvertMarkViewModel}">
+            <views:DeleteConvertMarkView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:DeleteFinalResultViewModel}">
+            <views:DeleteFinalResultView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:DeleteStudentMasterViewModel}">
+            <views:DeleteStudentMasterView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:DeleteAuditCourseViewModel}">
+            <views:DeleteAuditCourseView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:DeleteIntexnCourseViewModel}">
+            <views:DeleteIntexnCourseView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:DeleteNccCourseViewModel}">
+            <views:DeleteNccCourseView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:DeleteNaanMudhalvanViewModel}">
+            <views:DeleteNaanMudhalvanView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:DeleteMandatoryCourseViewModel}">
+            <views:DeleteMandatoryCourseView/>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid Background="#FAFAFA">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="260"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ── Sub-Sidebar ──────────────────────────────────── -->
+        <Border Grid.Column="0" Background="White"
+                BorderThickness="0 0 1 0" BorderBrush="#E4E4E7"
+                ClipToBounds="True">
+            <DockPanel>
+                <!-- Header -->
+                <Border DockPanel.Dock="Top"
+                        Padding="16 16 16 14"
+                        BorderThickness="0 0 0 1" BorderBrush="#E4E4E7">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <md:PackIcon Kind="DeleteForever" Width="16" Height="16"
+                                         Foreground="#EF4444" VerticalAlignment="Center"/>
+                            <TextBlock Text="DELETE ENTRY" FontSize="11" FontWeight="Bold"
+                                       Foreground="#7C3AED" Margin="8 0 0 0" VerticalAlignment="Center"
+                                       FontFamily="Segoe UI Variable Display, Segoe UI"/>
+                        </StackPanel>
+                        <TextBlock Text="Remove Records from Database" FontSize="11"
+                                   Foreground="#71717A" Margin="0 3 0 0"
+                                   FontFamily="Segoe UI Variable Display, Segoe UI"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Footer -->
+                <Border DockPanel.Dock="Bottom"
+                        Padding="6 8" BorderThickness="0 1 0 0" BorderBrush="#E4E4E7">
+                    <Button Style="{StaticResource BackNavButton}"
+                            Command="{Binding DataContext.NavigateCommand,
+                                RelativeSource={RelativeSource FindAncestor,
+                                AncestorType={x:Type dashboardViews:DashboardView}}}"
+                            CommandParameter="Home">
+                        <StackPanel Orientation="Horizontal">
+                            <md:PackIcon Kind="ArrowLeft" Width="15" Height="15"
+                                         Margin="0 0 8 0" VerticalAlignment="Center"
+                                         Foreground="#EF4444"/>
+                            <TextBlock Text="Back to Dashboard" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Border>
+
+                <!-- Nav items (scrollable) -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0 8 0 0">
+                        <TextBlock Text="DELETE OPERATIONS" FontSize="10" FontWeight="Bold"
+                                   Foreground="#A1A1AA" Margin="16 10 0 4"
+                                   FontFamily="Segoe UI Variable Display, Segoe UI"/>
+
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}" CommandParameter="ExamApply">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="FileRemove" Width="15" Height="15"
+                                             Margin="0 0 10 0" VerticalAlignment="Center" Foreground="#EF4444"/>
+                                <TextBlock Text="Delete Exam Apply" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}" CommandParameter="InternalMark">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="ClipboardMinus" Width="15" Height="15"
+                                             Margin="0 0 10 0" VerticalAlignment="Center" Foreground="#F97316"/>
+                                <TextBlock Text="Delete Internal Mark" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}" CommandParameter="ExternalMark">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="ClipboardRemove" Width="15" Height="15"
+                                             Margin="0 0 10 0" VerticalAlignment="Center" Foreground="#EF4444"/>
+                                <TextBlock Text="Delete External Mark" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}" CommandParameter="ConvertMark">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="SwapHorizontal" Width="15" Height="15"
+                                             Margin="0 0 10 0" VerticalAlignment="Center" Foreground="#3B82F6"/>
+                                <TextBlock Text="Delete Convert Mark" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}" CommandParameter="FinalResult">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="ChartBox" Width="15" Height="15"
+                                             Margin="0 0 10 0" VerticalAlignment="Center" Foreground="#7C3AED"/>
+                                <TextBlock Text="Delete Final Result" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}" CommandParameter="StudentMaster">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="AccountRemove" Width="15" Height="15"
+                                             Margin="0 0 10 0" VerticalAlignment="Center" Foreground="#EF4444"/>
+                                <TextBlock Text="Delete Student Master" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}" CommandParameter="AuditCourse">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="BookMinus" Width="15" Height="15"
+                                             Margin="0 0 10 0" VerticalAlignment="Center" Foreground="#52525B"/>
+                                <TextBlock Text="Delete Audit Course" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}" CommandParameter="IntexnCourse">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="BookMinusOutline" Width="15" Height="15"
+                                             Margin="0 0 10 0" VerticalAlignment="Center" Foreground="#52525B"/>
+                                <TextBlock Text="Delete Internal Course" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}" CommandParameter="NccCourse">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="ShieldOff" Width="15" Height="15"
+                                             Margin="0 0 10 0" VerticalAlignment="Center" Foreground="#22C55E"/>
+                                <TextBlock Text="Delete NCC Course" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}" CommandParameter="NaanMudhalvan">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="StarMinus" Width="15" Height="15"
+                                             Margin="0 0 10 0" VerticalAlignment="Center" Foreground="#F97316"/>
+                                <TextBlock Text="Delete Naan Mudhalvan" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}" CommandParameter="MandatoryCourse">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="FileAlertOutline" Width="15" Height="15"
+                                             Margin="0 0 10 0" VerticalAlignment="Center" Foreground="#3B82F6"/>
+                                <TextBlock Text="Delete Mandatory Course" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <!-- ── Content Area ─────────────────────────────────── -->
+        <ContentControl Grid.Column="1" Content="{Binding CurrentDeleteView}" Margin="28 24"/>
+    </Grid>
+</UserControl>
