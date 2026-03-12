@@ -8,6 +8,7 @@
         xmlns:views="clr-namespace:ACGCET_Admin.Views.Dashboard"
         mc:Ignorable="d"
         Title="{Binding WindowTitle}"
+        Icon="pack://application:,,,/Resources/Images/acgcet_logo.ico"
         Height="720" Width="1280" MinHeight="600" MinWidth="900"
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized"
