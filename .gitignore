@@ -55,5 +55,5 @@ mono_crash.*
 *.ldf
 *.ndf
 
-# Sensitive config — contains DB credentials, NEVER commit this
-appsettings.json
+# Connection string is now compiled into the binary via AppSecrets.cs
+# appsettings.json only contains logging config — safe to commit

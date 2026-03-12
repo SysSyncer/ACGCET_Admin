@@ -23,12 +23,11 @@ namespace ACGCET_Admin
                     .ConfigureAppConfiguration((_, config) =>
                     {
                         config.SetBasePath(Directory.GetCurrentDirectory());
-                        config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                        config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
                     })
                     .ConfigureServices((context, services) =>
                     {
-                        string cs = context.Configuration.GetConnectionString("DefaultConnection")
-                            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+                        string cs = AppSecrets.ConnectionString;
 
                         services.AddDbContext<AcgcetDbContext>(
                             options => options.UseSqlServer(cs,

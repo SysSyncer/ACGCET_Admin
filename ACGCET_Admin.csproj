@@ -29,6 +29,7 @@
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
     <Content Include="Resources\**\*.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
