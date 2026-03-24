@@ -28,7 +28,14 @@ namespace ACGCET_Admin
                     })
                     .ConfigureServices((context, services) =>
                     {
+                        // Use AppSecrets for release builds; fall back to appsettings.json for local dev
                         string cs = AppSecrets.ConnectionString;
+                        if (string.IsNullOrEmpty(cs) || cs.Contains("##"))
+                        {
+                            cs = context.Configuration.GetConnectionString("DefaultConnection")
+                                 ?? throw new InvalidOperationException(
+                                     "No connection string found. Set DefaultConnection in appsettings.json.");
+                        }
 
                         services.AddDbContext<AcgcetDbContext>(
                             options => options.UseSqlServer(cs,

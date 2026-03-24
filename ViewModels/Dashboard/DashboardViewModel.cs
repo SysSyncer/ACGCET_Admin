@@ -253,14 +253,19 @@ namespace ACGCET_Admin.ViewModels.Dashboard
                         .Select(m => m.StudentId).Distinct().ToListAsync();
                     missingExternal = appStudentIds.Count - studentsWithExt.Count;
 
-                    // Merge global (ExaminationId=null) and exam-scoped locks per module
+                }
+
+                // Module lock status — always load regardless of whether an exam exists
+                {
                     var allModules = await _db.Modules.ToListAsync();
                     var globalLocks = await _db.ModuleLocks
                         .Where(ml => ml.ExaminationId == null)
                         .ToListAsync();
-                    var examLocks = await _db.ModuleLocks
-                        .Where(ml => ml.ExaminationId == latestExam.ExaminationId)
-                        .ToListAsync();
+                    var examLocks = latestExam != null
+                        ? await _db.ModuleLocks
+                            .Where(ml => ml.ExaminationId == latestExam.ExaminationId)
+                            .ToListAsync()
+                        : new System.Collections.Generic.List<ModuleLock>();
 
                     moduleLockInfos = allModules.Select(mod =>
                     {

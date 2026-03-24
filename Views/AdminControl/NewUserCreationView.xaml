@@ -36,6 +36,8 @@
             
             <TextBox materialDesign:HintAssist.Hint="Name" Text="{Binding FullName}" Margin="0 8" Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
 
+            <TextBox materialDesign:HintAssist.Hint="Email" Text="{Binding Email}" Margin="0 8" Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0 16">
                 <Button Content="CREATE" Command="{Binding CreateUserCommand}" Width="100" Style="{StaticResource PrimaryButton}"/>
                 <Button Content="CLEAR" Command="{Binding ClearCommand}" Click="Button_Clear_Click" Width="100" Margin="16 0 0 0" Style="{StaticResource SubtleButton}"/>

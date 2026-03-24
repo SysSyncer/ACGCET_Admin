@@ -35,6 +35,9 @@ namespace ACGCET_Admin.ViewModels.AdminControl
         private string _fullName = "";
 
         [ObservableProperty]
+        private string _email = "";
+
+        [ObservableProperty]
         private ObservableCollection<PermissionItem> _permissions = new();
 
         public ObservableCollection<string> Departments { get; } = new ObservableCollection<string>
@@ -99,6 +102,7 @@ namespace ACGCET_Admin.ViewModels.AdminControl
                 Department = Department,
                 Designation = Designation,
                 FullName = FullName,
+                Email = string.IsNullOrWhiteSpace(Email) ? null : Email.Trim(),
                 IsActive = true,
                 CreatedDate = DateTime.Now
             };
@@ -135,6 +139,7 @@ namespace ACGCET_Admin.ViewModels.AdminControl
             Department = "";
             Designation = "";
             FullName = "";
+            Email = "";
             foreach (var p in Permissions) p.IsSelected = false;
         }
 

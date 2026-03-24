@@ -128,11 +128,11 @@
                                 <md:PackIcon Kind="Eye"
                                         Width="20"
                                         Height="20"
-                                             Visibility="{Binding IsPasswordVisible, Converter={StaticResource InverseBTV}}"/>
+                                             Visibility="{Binding IsPasswordVisible, Converter={StaticResource BTV}}"/>
                                 <md:PackIcon Kind="EyeOff"
                                         Width="20"
                                         Height="20"
-                                             Visibility="{Binding IsPasswordVisible, Converter={StaticResource BTV}}"/>
+                                             Visibility="{Binding IsPasswordVisible, Converter={StaticResource InverseBTV}}"/>
                             </Grid>
                         </Button>
                     </Grid>

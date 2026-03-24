@@ -30,7 +30,7 @@
                       SelectedItem="{Binding SelectedSession}"
                       DisplayMemberPath="SessionName"/>
 
-            <ComboBox Grid.Column="1" Margin="0 4"
+            <ComboBox Grid.Column="1" Margin="4 4"
                       Style="{StaticResource MaterialDesignOutlinedComboBox}" Background="White"
                       ItemsSource="{Binding Semesters}"
                       SelectedItem="{Binding SelectedSemester}"/>
