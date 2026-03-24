@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using ACGCET_Admin.Services;
 
 namespace ACGCET_Admin.ViewModels.DeleteEntry
 {
@@ -33,7 +34,7 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
             {
                 var sessions = await _dbContext.ExamSessions.OrderByDescending(s => s.ExamSessionId).ToListAsync();
                 ExamSessions.Clear();
-                foreach(var s in sessions) ExamSessions.Add(s);
+                foreach (var s in sessions) ExamSessions.Add(s);
             }
             catch { /* ignore load errors */ }
         }
@@ -60,12 +61,12 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
                 .Where(r => r.StudentId == studentId && r.ExaminationId == exam.ExaminationId)
                 .ToListAsync();
 
-            foreach(var r in results)
+            foreach (var r in results)
             {
                 ResultList.Add(new DeleteResultItem
                 {
                     PaperCode = r.Paper!.PaperCode ?? "",
-                    Result = r.Grade ?? "", 
+                    Result = r.Grade ?? "",
                     ExamResultId = r.ExamResultId
                 });
             }
@@ -74,6 +75,7 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
         [RelayCommand]
         private async Task Delete()
         {
+            if (!UserPermissionService.Current.CanDelete("RESULTS")) { MessageBox.Show("Access Denied: You do not have permission to delete results.", "RBAC", MessageBoxButton.OK, MessageBoxImage.Warning); return; }
             var selected = ResultList.Where(r => r.IsSelected).ToList();
             if (!selected.Any()) { MessageBox.Show("Select results"); return; }
             if (MessageBox.Show($"Delete {selected.Count} final results?", "Confirm", MessageBoxButton.YesNo) == MessageBoxResult.Yes)

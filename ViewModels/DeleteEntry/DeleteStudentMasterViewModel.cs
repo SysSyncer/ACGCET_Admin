@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using ACGCET_Admin.Services;
 
 namespace ACGCET_Admin.ViewModels.DeleteEntry
 {
@@ -40,25 +41,26 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
         [RelayCommand]
         private async Task Delete()
         {
-             if (string.IsNullOrEmpty(RegNo)) return;
-             if (MessageBox.Show($"Are you sure you want to PERMANENTLY delete student {RegNo}? This might delete related records if supported, or fail if data exists.", "Confirm Delete Student", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
-             {
-                 var student = await _dbContext.Students.FirstOrDefaultAsync(s => s.RegistrationNumber == RegNo);
-                 if (student != null)
-                 {
-                     _dbContext.Students.Remove(student);
-                     try
-                     {
-                         await _dbContext.SaveChangesAsync();
-                         MessageBox.Show("Student Deleted Successfully");
-                         Clear();
-                     }
-                     catch (DbUpdateException ex)
-                     {
-                         MessageBox.Show($"Delete Failed. Likely due to existing records (Marks, Exam Applications). Please delete them first.\nError: {ex.InnerException?.Message ?? ex.Message}");
-                     }
-                 }
-             }
+            if (!UserPermissionService.Current.CanDelete("STU_MASTER")) { MessageBox.Show("Access Denied: You do not have permission to delete students.", "RBAC", MessageBoxButton.OK, MessageBoxImage.Warning); return; }
+            if (string.IsNullOrEmpty(RegNo)) return;
+            if (MessageBox.Show($"Are you sure you want to PERMANENTLY delete student {RegNo}? This might delete related records if supported, or fail if data exists.", "Confirm Delete Student", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            {
+                var student = await _dbContext.Students.FirstOrDefaultAsync(s => s.RegistrationNumber == RegNo);
+                if (student != null)
+                {
+                    _dbContext.Students.Remove(student);
+                    try
+                    {
+                        await _dbContext.SaveChangesAsync();
+                        MessageBox.Show("Student Deleted Successfully");
+                        Clear();
+                    }
+                    catch (DbUpdateException ex)
+                    {
+                        MessageBox.Show($"Delete Failed. Likely due to existing records (Marks, Exam Applications). Please delete them first.\nError: {ex.InnerException?.Message ?? ex.Message}");
+                    }
+                }
+            }
         }
 
         [RelayCommand]

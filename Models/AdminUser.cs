@@ -45,9 +45,9 @@ public partial class AdminUser
 
     public virtual ICollection<LockOverrideRequest> LockOverrideRequestRequestedByNavigations { get; set; } = new List<LockOverrideRequest>();
 
-    public virtual ICollection<MalpracticeDetectionLog> MalpracticeDetectionLogInvestigatedByNavigations { get; set; } = new List<MalpracticeDetectionLog>();
+    public virtual ICollection<AnomalyDetectionLog> AnomalyDetectionLogInvestigatedByNavigations { get; set; } = new List<AnomalyDetectionLog>();
 
-    public virtual ICollection<MalpracticeDetectionLog> MalpracticeDetectionLogSuspiciousUsers { get; set; } = new List<MalpracticeDetectionLog>();
+    public virtual ICollection<AnomalyDetectionLog> AnomalyDetectionLogSuspiciousUsers { get; set; } = new List<AnomalyDetectionLog>();
 
     public virtual ICollection<SystemAlert> SystemAlertAcknowledgedByNavigations { get; set; } = new List<SystemAlert>();
 

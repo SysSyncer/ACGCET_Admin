@@ -14,6 +14,7 @@ namespace ACGCET_Admin
     public partial class App : Application
     {
         private readonly IHost? _host;
+        private DeadlineEnforcementService? _deadlineService;
 
         public App()
         {
@@ -39,7 +40,7 @@ namespace ACGCET_Admin
                             optionsLifetime: ServiceLifetime.Singleton);
 
                         // Services
-                        services.AddSingleton<EmailService>();
+                        services.AddSingleton<UserPermissionService>();
 
                         // ViewModels
                         services.AddSingleton<MainViewModel>();
@@ -48,7 +49,7 @@ namespace ACGCET_Admin
                         // Main window
                         services.AddSingleton<MainWindow>(provider =>
                         {
-                            var vm  = provider.GetRequiredService<MainViewModel>();
+                            var vm = provider.GetRequiredService<MainViewModel>();
                             var win = new MainWindow(vm);
                             return win;
                         });
@@ -75,6 +76,10 @@ namespace ACGCET_Admin
                     MainWindow = mainWindow;
                     mainWindow.Show();
 
+                    // Start deadline enforcement (temporal logic constraints)
+                    _deadlineService = new DeadlineEnforcementService(_host.Services);
+                    _deadlineService.Start();
+
                     // Pre-warm EF Core so first login is fast
                     _ = Task.Run(async () =>
                     {
@@ -97,6 +102,7 @@ namespace ACGCET_Admin
 
         protected override async void OnExit(ExitEventArgs e)
         {
+            _deadlineService?.Stop();
             if (_host != null)
             {
                 using (_host) { await _host.StopAsync(); }

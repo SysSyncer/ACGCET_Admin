@@ -1,9 +1,13 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ACGCET_Admin.Models;
+using ACGCET_Admin.Services;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace ACGCET_Admin.ViewModels.AdminControl
 {
@@ -18,7 +22,7 @@ namespace ACGCET_Admin.ViewModels.AdminControl
         {
             _dbContext = dbContext;
             if (_dbContext != null)
-                LoadLocks();
+                _ = LoadLocksAsync();
         }
 
         public DataInputLockViewModel()
@@ -26,66 +30,112 @@ namespace ACGCET_Admin.ViewModels.AdminControl
             _dbContext = null!;
         }
 
-        private void LoadLocks()
+        private async Task LoadLocksAsync()
         {
-            // Join Modules with ModuleLocks (Global Lock: ExaminationId IS NULL)
-            var query = from m in _dbContext.Modules
-                        join l in _dbContext.ModuleLocks.Where(x => x.ExaminationId == null)
-                        on m.ModuleId equals l.ModuleId into locks
-                        from ml in locks.DefaultIfEmpty()
-                        select new { Module = m, Lock = ml };
+            // Determine the latest examination for exam-scoped locks
+            var latestExam = await _dbContext.Examinations
+                .OrderByDescending(e => e.ExaminationId)
+                .FirstOrDefaultAsync();
 
-            var result = query.ToList();
+            int? examId = latestExam?.ExaminationId;
+
+            // Load all modules, joining with both global (ExaminationId=null) and exam-scoped locks
+            var modules = await _dbContext.Modules.ToListAsync();
+            var globalLocks = await _dbContext.ModuleLocks
+                .Where(x => x.ExaminationId == null)
+                .ToListAsync();
+            var examLocks = examId != null
+                ? await _dbContext.ModuleLocks
+                    .Where(x => x.ExaminationId == examId)
+                    .ToListAsync()
+                : new List<ModuleLock>();
 
             LockItems.Clear();
-            foreach (var item in result)
+            foreach (var mod in modules)
             {
-                bool isLocked = item.Lock != null && (item.Lock.IsLocked ?? false);
+                var globalLock = globalLocks.FirstOrDefault(l => l.ModuleId == mod.ModuleId);
+                var examLock = examLocks.FirstOrDefault(l => l.ModuleId == mod.ModuleId);
 
-                LockItems.Add(new ModuleLockItem 
-                { 
-                    ModuleId = item.Module.ModuleId, 
-                    ModuleName = item.Module.ModuleName, 
-                    // Init the property based on the DB Lock status
-                    IsLocked = isLocked 
+                // Module is locked if EITHER global or exam-scoped lock is active
+                bool isLocked = (globalLock != null && (globalLock.IsLocked ?? false))
+                             || (examLock != null && (examLock.IsLocked ?? false));
+
+                LockItems.Add(new ModuleLockItem
+                {
+                    ModuleId = mod.ModuleId,
+                    ModuleName = mod.ModuleName,
+                    IsLocked = isLocked
                 });
             }
         }
 
         [RelayCommand]
-        private void UpdateLocks()
+        private async Task UpdateLocks()
         {
-            try 
+            if (!UserPermissionService.Current.CanUpdate("LOCK_MGMT"))
             {
+                MessageBox.Show("You do not have permission to modify locks.", "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                var latestExam = await _dbContext.Examinations
+                    .OrderByDescending(e => e.ExaminationId)
+                    .FirstOrDefaultAsync();
+
                 foreach (var item in LockItems)
                 {
-                    // Find existing global lock for this module
-                    var existingLock = _dbContext.ModuleLocks
-                        .FirstOrDefault(l => l.ModuleId == item.ModuleId && l.ExaminationId == null);
+                    // Update or create global lock (ExaminationId = null)
+                    var globalLock = await _dbContext.ModuleLocks
+                        .FirstOrDefaultAsync(l => l.ModuleId == item.ModuleId && l.ExaminationId == null);
 
-                    if (existingLock != null)
+                    if (globalLock != null)
                     {
-                        // Update existing
-                        existingLock.IsLocked = item.IsLocked;
-                        existingLock.LockedDateTime = item.IsLocked ? System.DateTime.Now : existingLock.LockedDateTime;
-                        existingLock.LockedBy = item.IsLocked ? "Admin" : existingLock.LockedBy;
+                        globalLock.IsLocked = item.IsLocked;
+                        globalLock.LockedDateTime = item.IsLocked ? System.DateTime.Now : globalLock.LockedDateTime;
+                        globalLock.LockedBy = item.IsLocked ? "Admin" : globalLock.LockedBy;
                     }
                     else if (item.IsLocked)
                     {
-                        // Create new lock ONLY if we are locking (don't clutter DB with unlocked records)
-                        var newLock = new ModuleLock
+                        _dbContext.ModuleLocks.Add(new ModuleLock
                         {
                             ModuleId = item.ModuleId,
-                            ExaminationId = null, // Global Lock
+                            ExaminationId = null,
                             IsLocked = true,
                             LockedDateTime = System.DateTime.Now,
                             LockedBy = "Admin",
                             LockReason = "Manual Lock via Admin UI"
-                        };
-                        _dbContext.ModuleLocks.Add(newLock);
+                        });
+                    }
+
+                    // Sync ALL exam-scoped locks for this module so old exam locks don't cause stale LOCKED state
+                    var allExamLocks = await _dbContext.ModuleLocks
+                        .Where(l => l.ModuleId == item.ModuleId && l.ExaminationId != null)
+                        .ToListAsync();
+
+                    foreach (var el in allExamLocks)
+                    {
+                        el.IsLocked = item.IsLocked;
+                        el.LockedDateTime = item.IsLocked ? System.DateTime.Now : el.LockedDateTime;
+                        el.LockedBy = item.IsLocked ? "Admin" : el.LockedBy;
+                    }
+
+                    // If locking and the latest exam has no lock record yet, create one
+                    if (item.IsLocked && latestExam != null && !allExamLocks.Any(l => l.ExaminationId == latestExam.ExaminationId))
+                    {
+                        _dbContext.ModuleLocks.Add(new ModuleLock
+                        {
+                            ModuleId = item.ModuleId,
+                            ExaminationId = latestExam.ExaminationId,
+                            IsLocked = true,
+                            LockedDateTime = System.DateTime.Now,
+                            LockedBy = "Admin",
+                            LockReason = "Manual Lock via Admin UI"
+                        });
                     }
                 }
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
                 MessageBox.Show("Input Locks Updated Successfully (SQL Security Enforced)");
             }
             catch (System.Exception ex)
@@ -97,14 +147,14 @@ namespace ACGCET_Admin.ViewModels.AdminControl
         [RelayCommand]
         private void Clear()
         {
-             foreach (var item in LockItems) item.IsLocked = false;
+            foreach (var item in LockItems) item.IsLocked = false;
         }
 
         [RelayCommand]
-        private void Refresh()
+        private async Task Refresh()
         {
             if (_dbContext != null)
-                LoadLocks();
+                await LoadLocksAsync();
         }
     }
 
@@ -112,7 +162,7 @@ namespace ACGCET_Admin.ViewModels.AdminControl
     {
         public int ModuleId { get; set; }
         public string ModuleName { get; set; } = "";
-        
+
         private bool _isLocked;
         public bool IsLocked
         {

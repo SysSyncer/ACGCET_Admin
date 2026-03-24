@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace ACGCET_Admin.Models;
 
-public partial class MalpracticeDetectionLog
+public partial class AnomalyDetectionLog
 {
-    public long MalpracticeDetectionLogId { get; set; }
+    public long AnomalyDetectionLogId { get; set; }
 
     public string DetectionType { get; set; } = null!;
 

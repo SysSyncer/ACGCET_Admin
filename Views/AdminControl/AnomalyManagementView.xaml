@@ -1,0 +1,126 @@
+<UserControl x:Class="ACGCET_Admin.Views.AdminControl.AnomalyManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:vm="clr-namespace:ACGCET_Admin.ViewModels.AdminControl"
+             d:DataContext="{d:DesignInstance Type=vm:AnomalyManagementViewModel}"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="700"
+             d:DesignWidth="900">
+    <Grid Margin="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title -->
+        <TextBlock Grid.Row="0"
+                   Text="Anomaly Detection Log"
+                   FontSize="20"
+                   FontWeight="Bold"
+                   Foreground="#7C3AED"
+                   Margin="0 0 0 12"/>
+
+        <!-- Filters -->
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    Margin="0 0 0 12">
+            <TextBlock Text="Status:"
+                       VerticalAlignment="Center"
+                       Margin="0 0 6 0"/>
+            <ComboBox ItemsSource="{Binding StatusFilters}"
+                      SelectedItem="{Binding SelectedStatusFilter}"
+                      Width="150"
+                      Margin="0 0 16 0"
+                      md:HintAssist.Hint="Status"
+                      Style="{StaticResource MaterialDesignOutlinedComboBox}"/>
+            <TextBlock Text="Severity:"
+                       VerticalAlignment="Center"
+                       Margin="0 0 6 0"/>
+            <ComboBox ItemsSource="{Binding SeverityFilters}"
+                      SelectedItem="{Binding SelectedSeverityFilter}"
+                      Width="150"
+                      Margin="0 0 16 0"
+                      md:HintAssist.Hint="Severity"
+                      Style="{StaticResource MaterialDesignOutlinedComboBox}"/>
+            <Button Content="Refresh"
+                    Command="{Binding LoadCommand}"
+                    Style="{StaticResource MaterialDesignOutlinedButton}"
+                    Margin="8 0 0 0"/>
+        </StackPanel>
+
+        <!-- Incidents Grid -->
+        <DataGrid Grid.Row="2"
+                  ItemsSource="{Binding Incidents}"
+                  SelectedItem="{Binding SelectedIncident}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  CanUserSortColumns="True"
+                  Style="{StaticResource MaterialDesignDataGrid}"
+                  md:DataGridAssist.CellPadding="8 4"
+                  Margin="0 0 0 12">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Date"
+                                    Binding="{Binding DetectionDateTime, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}"
+                                    Width="130"/>
+                <DataGridTextColumn Header="Type"
+                                    Binding="{Binding DetectionType}"
+                                    Width="120"/>
+                <DataGridTextColumn Header="Severity"
+                                    Binding="{Binding SeverityLevel}"
+                                    Width="80"/>
+                <DataGridTextColumn Header="User"
+                                    Binding="{Binding SuspiciousUser.UserName}"
+                                    Width="100"/>
+                <DataGridTextColumn Header="Table"
+                                    Binding="{Binding TargetTable}"
+                                    Width="100"/>
+                <DataGridTextColumn Header="Reason"
+                                    Binding="{Binding DetectionReason}"
+                                    Width="*"/>
+                <DataGridTextColumn Header="Action"
+                                    Binding="{Binding ActionTaken}"
+                                    Width="90"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Action Panel -->
+        <md:Card Grid.Row="3"
+                 Padding="16"
+                 md:ElevationAssist.Elevation="Dp2">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="0"
+                         Text="{Binding InvestigationNotes, UpdateSourceTrigger=PropertyChanged}"
+                         md:HintAssist.Hint="Investigation Notes"
+                         Margin="0 0 8 0"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                <TextBox Grid.Column="1"
+                         Text="{Binding ActionTaken, UpdateSourceTrigger=PropertyChanged}"
+                         md:HintAssist.Hint="Action Taken"
+                         Margin="0 0 8 0"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal">
+                    <Button Content="Mark Investigated"
+                            Command="{Binding MarkInvestigatedCommand}"
+                            Style="{StaticResource MaterialDesignRaisedButton}"
+                            Background="#7C3AED"
+                            Foreground="White"
+                            Margin="0 0 8 0"/>
+                    <Button Content="Dismiss"
+                            Command="{Binding DismissIncidentCommand}"
+                            Style="{StaticResource MaterialDesignOutlinedButton}"/>
+                </StackPanel>
+            </Grid>
+        </md:Card>
+    </Grid>
+</UserControl>

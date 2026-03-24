@@ -19,38 +19,38 @@ namespace ACGCET_Admin.ViewModels.Application
 
         // Filters
         [ObservableProperty]
-        private ObservableCollection<string> _levels = new() { "Select", "UG", "PG" };
+        private ObservableCollection<string> _levels = new() { "UG", "PG" };
 
         [ObservableProperty]
-        private ObservableCollection<string> _programs = new() { "Select" };
+        private ObservableCollection<string> _programs = new();
 
         [ObservableProperty]
-        private ObservableCollection<string> _regulations = new() { "Select" }; // Batch in legacy
+        private ObservableCollection<string> _regulations = new();
 
         [ObservableProperty]
-        private ObservableCollection<string> _semesters = new() { "Select", "1", "2", "3", "4", "5", "6", "7", "8" };
+        private ObservableCollection<string> _semesters = new() { "1", "2", "3", "4", "5", "6", "7", "8" };
 
         [ObservableProperty]
-        private ObservableCollection<string> _sections = new() { "Select", "Overall", "A", "B", "C", "D" };
+        private ObservableCollection<string> _sections = new() { "Overall", "A", "B", "C", "D" };
 
         [ObservableProperty]
         private ObservableCollection<PaperDto> _papersList = new();
 
         // Selected Values
         [ObservableProperty]
-        private string _selectedLevel = "Select";
+        private string? _selectedLevel;
 
         [ObservableProperty]
-        private string _selectedProgram = "Select";
+        private string? _selectedProgram;
 
         [ObservableProperty]
-        private string _selectedRegulation = "Select";
+        private string? _selectedRegulation;
 
         [ObservableProperty]
-        private string _selectedSemester = "Select";
+        private string? _selectedSemester;
 
         [ObservableProperty]
-        private string _selectedSection = "Select";
+        private string? _selectedSection;
 
         [ObservableProperty]
         private PaperDto? _selectedPaper;
@@ -81,8 +81,8 @@ namespace ACGCET_Admin.ViewModels.Application
             try
             {
                 IsLoading = true;
-                List<string> programs = new List<string> { "Select" };
-                List<string> regulations = new List<string> { "Select" };
+                List<string> programs = new List<string>();
+                List<string> regulations = new List<string>();
 
                 if (_dbContext != null)
                 {
@@ -104,13 +104,13 @@ namespace ACGCET_Admin.ViewModels.Application
         }
 
         // Trigger loading papers when dependencies change
-        partial void OnSelectedProgramChanged(string value) => LoadPapers();
-        partial void OnSelectedRegulationChanged(string value) => LoadPapers();
-        partial void OnSelectedSemesterChanged(string value) => LoadPapers();
+        partial void OnSelectedProgramChanged(string? value) => LoadPapers();
+        partial void OnSelectedRegulationChanged(string? value) => LoadPapers();
+        partial void OnSelectedSemesterChanged(string? value) => LoadPapers();
 
         private void LoadPapers()
         {
-            if (SelectedProgram == "Select" || SelectedRegulation == "Select" || SelectedSemester == "Select")
+            if (SelectedProgram == null || SelectedRegulation == null || SelectedSemester == null)
             {
                 PapersList.Clear();
                 return;
@@ -158,7 +158,7 @@ namespace ACGCET_Admin.ViewModels.Application
                     .Where(s => s.Batch!.Course!.Program!.ProgramName == SelectedProgram &&
                                 s.Regulation!.RegulationName == SelectedRegulation);
 
-                if (SelectedSection != "Select" && SelectedSection != "Overall")
+                if (SelectedSection != null && SelectedSection != "Overall")
                 {
                     query = query.Where(s => s.Section!.SectionName == SelectedSection);
                 }
@@ -199,11 +199,11 @@ namespace ACGCET_Admin.ViewModels.Application
         [RelayCommand]
         private void ClearFilters()
         {
-            SelectedLevel = "Select";
-            SelectedProgram = "Select";
-            SelectedRegulation = "Select";
-            SelectedSemester = "Select";
-            SelectedSection = "Select";
+            SelectedLevel = null;
+            SelectedProgram = null;
+            SelectedRegulation = null;
+            SelectedSemester = null;
+            SelectedSection = null;
             SelectedPaper = null;
             ReportData.Clear();
             PapersList.Clear();

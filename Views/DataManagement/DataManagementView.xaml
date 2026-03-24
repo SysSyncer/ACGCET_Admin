@@ -1,0 +1,546 @@
+<UserControl x:Class="ACGCET_Admin.Views.DataManagement.DataManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:vm="clr-namespace:ACGCET_Admin.ViewModels.DataManagement"
+             xmlns:v="clr-namespace:ACGCET_Admin.Views.DataManagement"
+             xmlns:dashboardViews="clr-namespace:ACGCET_Admin.Views.Dashboard"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:DataManagementViewModel}"
+             d:DesignHeight="750"
+        d:DesignWidth="1200">
+
+    <UserControl.Resources>
+        <!-- Lookup Tables -->
+        <DataTemplate DataType="{x:Type vm:ManageDegreesViewModel}">
+            <v:ManageDegreesView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ManageProgramsViewModel}">
+            <v:ManageProgramsView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ManageRegulationsViewModel}">
+            <v:ManageRegulationsView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ManageExamTypesViewModel}">
+            <v:ManageExamTypesView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ManageTestTypesViewModel}">
+            <v:ManageTestTypesView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ManageSchemesViewModel}">
+            <v:ManageSchemesView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ManageExamSessionsViewModel}">
+            <v:ManageExamSessionsView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ManageBlocksViewModel}">
+            <v:ManageBlocksView/>
+        </DataTemplate>
+        <!-- Academic -->
+        <DataTemplate DataType="{x:Type vm:ManageCoursesViewModel}">
+            <v:ManageCoursesView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ManageBatchesViewModel}">
+            <v:ManageBatchesView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ManageSectionsViewModel}">
+            <v:ManageSectionsView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ManagePapersViewModel}">
+            <v:ManagePapersView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ManagePaperFeesViewModel}">
+            <v:ManagePaperFeesView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ManagePassingCriteriaViewModel}">
+            <v:ManagePassingCriteriaView/>
+        </DataTemplate>
+        <!-- Students -->
+        <DataTemplate DataType="{x:Type vm:ManageStudentsViewModel}">
+            <v:ManageStudentsView/>
+        </DataTemplate>
+        <!-- Examinations -->
+        <DataTemplate DataType="{x:Type vm:ManageExaminationsViewModel}">
+            <v:ManageExaminationsView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ManageExamApplicationsViewModel}">
+            <v:ManageExamApplicationsView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ManageExamScheduleViewModel}">
+            <v:ManageExamScheduleView/>
+        </DataTemplate>
+        <!-- Infrastructure -->
+        <DataTemplate DataType="{x:Type vm:ManageRoomsViewModel}">
+            <v:ManageRoomsView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ManageSeatAllocationsViewModel}">
+            <v:ManageSeatAllocationsView/>
+        </DataTemplate>
+        <!-- Marks & Results -->
+        <DataTemplate DataType="{x:Type vm:ManageInternalMarksViewModel}">
+            <v:ManageInternalMarksView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ManageExternalMarksViewModel}">
+            <v:ManageExternalMarksView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ManageExamResultsViewModel}">
+            <v:ManageExamResultsView/>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid Background="#FAFAFA">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="260"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ── Sidebar ── -->
+        <Border Grid.Column="0"
+                Background="White"
+                BorderThickness="0 0 1 0"
+                BorderBrush="#E4E4E7"
+                ClipToBounds="True">
+            <DockPanel>
+                <!-- Header -->
+                <Border DockPanel.Dock="Top"
+                        Padding="16 16 16 14"
+                        BorderThickness="0 0 0 1"
+                        BorderBrush="#E4E4E7">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <md:PackIcon Kind="DatabaseCog"
+                                    Width="16"
+                                    Height="16"
+                                    Foreground="#7C3AED"
+                                    VerticalAlignment="Center"/>
+                            <TextBlock Text="DATA MANAGEMENT"
+                                    FontSize="11"
+                                    FontWeight="Bold"
+                                       Foreground="#7C3AED"
+                                    Margin="8 0 0 0"
+                                    VerticalAlignment="Center"
+                                       FontFamily="Segoe UI Variable Display, Segoe UI"/>
+                        </StackPanel>
+                        <TextBlock Text="Add &amp; Manage Records"
+                                FontSize="11"
+                                Foreground="#71717A"
+                                Margin="0 3 0 0"
+                                   FontFamily="Segoe UI Variable Display, Segoe UI"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Footer -->
+                <Border DockPanel.Dock="Bottom"
+                        Padding="6 8"
+                        BorderThickness="0 1 0 0"
+                        BorderBrush="#E4E4E7">
+                    <Button Style="{StaticResource BackNavButton}"
+                            Command="{Binding DataContext.NavigateCommand,
+                                RelativeSource={RelativeSource FindAncestor,
+                                AncestorType={x:Type dashboardViews:DashboardView}}}"
+                            CommandParameter="Home">
+                        <StackPanel Orientation="Horizontal">
+                            <md:PackIcon Kind="ArrowLeft"
+                                    Width="15"
+                                    Height="15"
+                                    Margin="0 0 8 0"
+                                    VerticalAlignment="Center"
+                                    Foreground="#EF4444"/>
+                            <TextBlock Text="Back to Dashboard"
+                                    VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Border>
+
+                <!-- Nav Items (Scrollable) -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                        HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="0 4 0 0">
+
+                        <!-- ─── LOOKUP TABLES ─── -->
+                        <TextBlock Text="LOOKUP TABLES"
+                                FontSize="10"
+                                FontWeight="Bold"
+                                Foreground="#A1A1AA"
+                                Margin="16 10 0 4"
+                                   FontFamily="Segoe UI Variable Display, Segoe UI"/>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="Degrees">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="School"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#7C3AED"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Degrees"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="Programs">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="BookEducation"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#2563EB"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Programs"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="Regulations">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="Gavel"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#D97706"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Regulations"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="ExamTypes">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="ClipboardText"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#059669"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Exam Types"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="TestTypes">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="FileDocument"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#DC2626"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Test Types"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="Schemes">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="Cog"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#6366F1"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Schemes"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="ExamSessions">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="ClockOutline"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#0891B2"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Exam Sessions"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="Blocks">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="OfficeBuildingMarker"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#78716C"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Blocks"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- ─── ACADEMIC STRUCTURE ─── -->
+                        <TextBlock Text="ACADEMIC STRUCTURE"
+                                FontSize="10"
+                                FontWeight="Bold"
+                                Foreground="#A1A1AA"
+                                Margin="16 16 0 4"
+                                   FontFamily="Segoe UI Variable Display, Segoe UI"/>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="Courses">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="BookOpenPageVariant"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#7C3AED"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Courses"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="Batches">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="AccountGroup"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#2563EB"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Batches"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="Sections">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="ViewGrid"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#059669"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Sections"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="Papers">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="NotebookMultiple"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#D97706"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Papers / Subjects"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="PaperFees">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="CurrencyInr"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#DC2626"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Paper Fees"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="PassingCriteria">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="CheckDecagram"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#22C55E"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Passing Criteria"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- ─── STUDENTS ─── -->
+                        <TextBlock Text="STUDENT MANAGEMENT"
+                                FontSize="10"
+                                FontWeight="Bold"
+                                Foreground="#A1A1AA"
+                                Margin="16 16 0 4"
+                                   FontFamily="Segoe UI Variable Display, Segoe UI"/>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="Students">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="AccountMultiplePlus"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#22C55E"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Students (+ CSV)"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- ─── EXAMINATIONS ─── -->
+                        <TextBlock Text="EXAMINATION"
+                                FontSize="10"
+                                FontWeight="Bold"
+                                Foreground="#A1A1AA"
+                                Margin="16 16 0 4"
+                                   FontFamily="Segoe UI Variable Display, Segoe UI"/>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="Examinations">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="CalendarClock"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#7C3AED"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Examinations"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="ExamApplications">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="FileDocumentPlus"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#2563EB"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Exam Applications"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="ExamSchedule">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="CalendarMonth"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#D97706"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Exam Schedule"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- ─── INFRASTRUCTURE ─── -->
+                        <TextBlock Text="INFRASTRUCTURE"
+                                FontSize="10"
+                                FontWeight="Bold"
+                                Foreground="#A1A1AA"
+                                Margin="16 16 0 4"
+                                   FontFamily="Segoe UI Variable Display, Segoe UI"/>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="Rooms">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="DoorOpen"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#78716C"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Rooms"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="SeatAllocations">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="SeatReclineNormal"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#0891B2"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Seat Allocations"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- ─── MARKS & RESULTS ─── -->
+                        <TextBlock Text="MARKS &amp; RESULTS"
+                                FontSize="10"
+                                FontWeight="Bold"
+                                Foreground="#A1A1AA"
+                                Margin="16 16 0 4"
+                                   FontFamily="Segoe UI Variable Display, Segoe UI"/>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="InternalMarks">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="Pencil"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#F97316"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Internal Marks"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="ExternalMarks">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="PencilBox"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#DC2626"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="External Marks"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubNavButton}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="ExamResults">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Kind="ChartBox"
+                                        Width="15"
+                                        Height="15"
+                                        Margin="0 0 10 0"
+                                        Foreground="#22C55E"
+                                        VerticalAlignment="Center"/>
+                                <TextBlock Text="Exam Results"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Border Height="16"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <!-- ── Content Area ── -->
+        <ScrollViewer Grid.Column="1"
+                VerticalScrollBarVisibility="Auto"
+                HorizontalScrollBarVisibility="Disabled">
+            <ContentControl Content="{Binding CurrentDataView}"
+                    Margin="28 24"/>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

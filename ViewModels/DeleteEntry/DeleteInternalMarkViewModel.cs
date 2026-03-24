@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using ACGCET_Admin.Services;
 
 namespace ACGCET_Admin.ViewModels.DeleteEntry
 {
@@ -15,11 +16,11 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
 
         [ObservableProperty] private ObservableCollection<ExamSession> _examSessions = new();
         [ObservableProperty] private ExamSession _selectedSession = null!;
-        
+
         [ObservableProperty] private string _regNo = "";
         [ObservableProperty] private string _studentName = "";
 
-        [ObservableProperty] 
+        [ObservableProperty]
         private ObservableCollection<DeleteInternalMarkItem> _markList = new();
 
         public DeleteInternalMarkViewModel(AcgcetDbContext dbContext)
@@ -34,7 +35,7 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
             {
                 var sessions = await _dbContext.ExamSessions.OrderByDescending(s => s.ExamSessionId).ToListAsync();
                 ExamSessions.Clear();
-                foreach(var s in sessions) ExamSessions.Add(s);
+                foreach (var s in sessions) ExamSessions.Add(s);
             }
             catch { /* ignore load errors */ }
         }
@@ -57,42 +58,43 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
 
         private async Task LoadMarks(int studentId)
         {
-             MarkList.Clear();
-             // Internal Marks likely not tied strictly to ExamSession in DB schema (no examId in InternalMarks), 
-             // but filtered by Papers registered in that Session?
-             // Or just show all Internal Marks for that student?
-             // Usually Internal Marks are per semester.
-             // If User selects Session, maybe filter by Papers in that session?
-             
-             // Schema: InternalMarks (StudentId, PaperId, TestTypeId, Semester...)
-             // It doesn't have ExamId.
-             // But we can filter by papers registered in selected Exam Session?
-             // Or just show all.
-             // I'll show all for now, or filter if Session is selected.
-             
-             var query = _dbContext.InternalMarks
-                 .Include(m => m.Paper)
-                 .Include(m => m.TestType)
-                 .Where(m => m.StudentId == studentId);
-                 
-             var marks = await query.ToListAsync();
-             foreach(var m in marks)
-             {
-                 MarkList.Add(new DeleteInternalMarkItem
-                 {
-                     PaperCode = m.Paper!.PaperCode ?? "",
-                     TestName = m.TestType!.TestName ?? "",
-                     Mark = m.Mark?.ToString() ?? "Abs",
-                     InternalMarkId = m.InternalMarkId
-                 });
-             }
+            MarkList.Clear();
+            // Internal Marks likely not tied strictly to ExamSession in DB schema (no examId in InternalMarks), 
+            // but filtered by Papers registered in that Session?
+            // Or just show all Internal Marks for that student?
+            // Usually Internal Marks are per semester.
+            // If User selects Session, maybe filter by Papers in that session?
+
+            // Schema: InternalMarks (StudentId, PaperId, TestTypeId, Semester...)
+            // It doesn't have ExamId.
+            // But we can filter by papers registered in selected Exam Session?
+            // Or just show all.
+            // I'll show all for now, or filter if Session is selected.
+
+            var query = _dbContext.InternalMarks
+                .Include(m => m.Paper)
+                .Include(m => m.TestType)
+                .Where(m => m.StudentId == studentId);
+
+            var marks = await query.ToListAsync();
+            foreach (var m in marks)
+            {
+                MarkList.Add(new DeleteInternalMarkItem
+                {
+                    PaperCode = m.Paper!.PaperCode ?? "",
+                    TestName = m.TestType!.TestName ?? "",
+                    Mark = m.Mark?.ToString() ?? "Abs",
+                    InternalMarkId = m.InternalMarkId
+                });
+            }
         }
 
         [RelayCommand]
         private async Task Delete()
         {
+            if (!UserPermissionService.Current.CanDelete("INT_MARKS")) { MessageBox.Show("Access Denied: You do not have permission to delete internal marks.", "RBAC", MessageBoxButton.OK, MessageBoxImage.Warning); return; }
             var selected = MarkList.Where(m => m.IsSelected).ToList();
-            if(!selected.Any()) { MessageBox.Show("Select marks to delete"); return; }
+            if (!selected.Any()) { MessageBox.Show("Select marks to delete"); return; }
 
             if (MessageBox.Show($"Delete {selected.Count} marks?", "Confirm", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
@@ -100,7 +102,7 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
                 var toDelete = await _dbContext.InternalMarks.Where(m => ids.Contains(m.InternalMarkId)).ToListAsync();
                 _dbContext.InternalMarks.RemoveRange(toDelete);
                 await _dbContext.SaveChangesAsync();
-                
+
                 await Search(); // Reload
                 MessageBox.Show("Deleted");
             }
@@ -127,7 +129,7 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
         public string TestName { get; set; } = "";
         public string Mark { get; set; } = "";
         public long InternalMarkId { get; set; }
-        
+
         [ObservableProperty] private bool _isSelected;
     }
 }

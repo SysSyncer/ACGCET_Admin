@@ -18,31 +18,31 @@ namespace ACGCET_Admin.ViewModels.Application
 
         // Filters
         [ObservableProperty]
-        private ObservableCollection<string> _examinations = new() { "Select" };
+        private ObservableCollection<string> _examinations = new();
 
         [ObservableProperty]
-        private ObservableCollection<string> _levels = new() { "Select", "UG", "PG" };
+        private ObservableCollection<string> _levels = new() { "UG", "PG" };
 
         [ObservableProperty]
-        private ObservableCollection<string> _programs = new() { "Select" };
+        private ObservableCollection<string> _programs = new();
 
         [ObservableProperty]
-        private ObservableCollection<string> _regulations = new() { "Select" };
+        private ObservableCollection<string> _regulations = new();
 
         [ObservableProperty]
-        private ObservableCollection<string> _sections = new() { "Select", "Overall", "A", "B", "C", "D" };
+        private ObservableCollection<string> _sections = new() { "Overall", "A", "B", "C", "D" };
 
         // Selected Values
         [ObservableProperty]
-        private string _selectedExamination = "Select";
+        private string? _selectedExamination;
         [ObservableProperty]
-        private string _selectedLevel = "Select";
+        private string? _selectedLevel;
         [ObservableProperty]
-        private string _selectedProgram = "Select";
+        private string? _selectedProgram;
         [ObservableProperty]
-        private string _selectedRegulation = "Select";
+        private string? _selectedRegulation;
         [ObservableProperty]
-        private string _selectedSection = "Select";
+        private string? _selectedSection;
 
         // Data
         [ObservableProperty]
@@ -70,9 +70,9 @@ namespace ACGCET_Admin.ViewModels.Application
             try
             {
                 IsLoading = true;
-                List<string> exams = new List<string> { "Select" };
-                List<string> programs = new List<string> { "Select" };
-                List<string> regulations = new List<string> { "Select" };
+                List<string> exams = new List<string>();
+                List<string> programs = new List<string>();
+                List<string> regulations = new List<string>();
 
                 if (_dbContext != null)
                 {
@@ -111,11 +111,11 @@ namespace ACGCET_Admin.ViewModels.Application
             {
                 var query = _dbContext.Students.AsQueryable();
 
-                if (SelectedProgram != "Select")
+                if (SelectedProgram != null)
                     query = query.Where(s => s.Batch!.Course!.Program!.ProgramName == SelectedProgram);
-                if (SelectedRegulation != "Select")
+                if (SelectedRegulation != null)
                     query = query.Where(s => s.Regulation!.RegulationName == SelectedRegulation);
-                if (SelectedSection != "Select" && SelectedSection != "Overall")
+                if (SelectedSection != null && SelectedSection != "Overall")
                     query = query.Where(s => s.Section!.SectionName == SelectedSection);
 
                 var students = await query
@@ -153,10 +153,10 @@ namespace ACGCET_Admin.ViewModels.Application
             {
                 IsPreview = isPreview,
                 Students = Students.ToList(),
-                ExamName = SelectedExamination,
-                Program = SelectedProgram,
-                Regulation = SelectedRegulation,
-                Section = SelectedSection
+                ExamName = SelectedExamination ?? "",
+                Program = SelectedProgram ?? "",
+                Regulation = SelectedRegulation ?? "",
+                Section = SelectedSection ?? ""
             };
             
             WeakReferenceMessenger.Default.Send(msg);
@@ -171,11 +171,11 @@ namespace ACGCET_Admin.ViewModels.Application
         [RelayCommand]
         private void ClearFilters()
         {
-            SelectedExamination = "Select";
-            SelectedLevel = "Select";
-            SelectedProgram = "Select";
-            SelectedRegulation = "Select";
-            SelectedSection = "Select";
+            SelectedExamination = null;
+            SelectedLevel = null;
+            SelectedProgram = null;
+            SelectedRegulation = null;
+            SelectedSection = null;
             Students.Clear();
         }
 

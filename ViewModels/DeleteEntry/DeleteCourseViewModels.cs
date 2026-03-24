@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using ACGCET_Admin.Services;
 
 namespace ACGCET_Admin.ViewModels.DeleteEntry
 {
@@ -42,7 +43,7 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
                 .Where(p => p.ExamApplication!.StudentId == studentId && p.Paper!.PaperType!.TypeName == _targetPaperType)
                 .ToListAsync();
 
-            foreach(var p in papers)
+            foreach (var p in papers)
             {
                 PaperList.Add(new DeleteBookItem
                 {
@@ -56,17 +57,18 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
         [RelayCommand]
         protected async Task Delete()
         {
-             var selected = PaperList.Where(p => p.IsSelected).ToList();
-             if (!selected.Any()) { MessageBox.Show("Select papers"); return; }
-             if (MessageBox.Show($"Delete {selected.Count} entries?", "Confirm", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-             {
-                 var ids = selected.Select(p => p.Id).ToList();
-                 var toDelete = await _dbContext.ExamApplicationPapers.Where(x => ids.Contains(x.ExamApplicationPaperId)).ToListAsync();
-                 _dbContext.ExamApplicationPapers.RemoveRange(toDelete);
-                 await _dbContext.SaveChangesAsync();
-                 await Search();
-                 MessageBox.Show("Deleted");
-             }
+            if (!UserPermissionService.Current.CanDelete("EXAM_APPLICATION")) { MessageBox.Show("Access Denied: You do not have permission to delete exam entries.", "RBAC", MessageBoxButton.OK, MessageBoxImage.Warning); return; }
+            var selected = PaperList.Where(p => p.IsSelected).ToList();
+            if (!selected.Any()) { MessageBox.Show("Select papers"); return; }
+            if (MessageBox.Show($"Delete {selected.Count} entries?", "Confirm", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                var ids = selected.Select(p => p.Id).ToList();
+                var toDelete = await _dbContext.ExamApplicationPapers.Where(x => ids.Contains(x.ExamApplicationPaperId)).ToListAsync();
+                _dbContext.ExamApplicationPapers.RemoveRange(toDelete);
+                await _dbContext.SaveChangesAsync();
+                await Search();
+                MessageBox.Show("Deleted");
+            }
         }
 
         [RelayCommand] protected void Clear() { RegNo = ""; StudentName = ""; PaperList.Clear(); }

@@ -57,7 +57,7 @@ public partial class AcgcetDbContext : DbContext
 
     public virtual DbSet<LockOverrideRequest> LockOverrideRequests { get; set; }
 
-    public virtual DbSet<MalpracticeDetectionLog> MalpracticeDetectionLogs { get; set; }
+    public virtual DbSet<AnomalyDetectionLog> AnomalyDetectionLogs { get; set; }
 
     public virtual DbSet<Module> Modules { get; set; }
 
@@ -120,8 +120,8 @@ public partial class AcgcetDbContext : DbContext
             // Only configure if not already configured (e.g. by DI)
             // Ideally we'd remove this entirely, but this preserves behavior for parameterless ctor scenarios if needed
             // The warning is suppressed because the connection string should come from appsettings.json when using DI
-             optionsBuilder.UseSqlServer("Data Source=localhost\\SQLEXPRESS01;Initial Catalog=ACGCET_MASTER;Integrated Security=True;Trust Server Certificate=True");
-    
+            optionsBuilder.UseSqlServer("Data Source=localhost\\SQLEXPRESS01;Initial Catalog=ACGCET_MASTER;Integrated Security=True;Trust Server Certificate=True");
+
         }
     }
 
@@ -584,13 +584,13 @@ public partial class AcgcetDbContext : DbContext
                 .HasConstraintName("FK_LockOverrideReq_RequestedBy");
         });
 
-        modelBuilder.Entity<MalpracticeDetectionLog>(entity =>
+        modelBuilder.Entity<AnomalyDetectionLog>(entity =>
         {
-            entity.HasKey(e => e.MalpracticeDetectionLogId).HasName("PK__Malpract__5DFCDBBE1F9A0D60");
+            entity.HasKey(e => e.AnomalyDetectionLogId).HasName("PK__Malpract__5DFCDBBE1F9A0D60");
 
-            entity.ToTable("MalpracticeDetectionLog");
+            entity.ToTable("AnomalyDetectionLog");
 
-            entity.HasIndex(e => e.SeverityLevel, "IX_MalpracticeLog_Severity");
+            entity.HasIndex(e => e.SeverityLevel, "IX_AnomalyLog_Severity");
 
             entity.Property(e => e.ActionTaken).HasMaxLength(500);
             entity.Property(e => e.DetectionDateTime)
@@ -603,13 +603,13 @@ public partial class AcgcetDbContext : DbContext
             entity.Property(e => e.TargetRecordId).HasMaxLength(50);
             entity.Property(e => e.TargetTable).HasMaxLength(100);
 
-            entity.HasOne(d => d.InvestigatedByNavigation).WithMany(p => p.MalpracticeDetectionLogInvestigatedByNavigations)
+            entity.HasOne(d => d.InvestigatedByNavigation).WithMany(p => p.AnomalyDetectionLogInvestigatedByNavigations)
                 .HasForeignKey(d => d.InvestigatedBy)
-                .HasConstraintName("FK_MalpracticeLog_InvestigatedBy");
+                .HasConstraintName("FK_AnomalyLog_InvestigatedBy");
 
-            entity.HasOne(d => d.SuspiciousUser).WithMany(p => p.MalpracticeDetectionLogSuspiciousUsers)
+            entity.HasOne(d => d.SuspiciousUser).WithMany(p => p.AnomalyDetectionLogSuspiciousUsers)
                 .HasForeignKey(d => d.SuspiciousUserId)
-                .HasConstraintName("FK_MalpracticeLog_SuspiciousUser");
+                .HasConstraintName("FK_AnomalyLog_SuspiciousUser");
         });
 
         modelBuilder.Entity<Module>(entity =>
@@ -1130,4 +1130,32 @@ public partial class AcgcetDbContext : DbContext
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+    /// <summary>
+    /// Sets SQL SESSION_CONTEXT with the current user's username so that
+    /// database audit triggers can identify who performed the action.
+    /// Call this once after login.
+    /// </summary>
+    public void SetSessionContext(string username)
+    {
+        if (string.IsNullOrEmpty(username)) return;
+        try
+        {
+            var connection = Database.GetDbConnection();
+            if (connection.State != System.Data.ConnectionState.Open)
+                connection.Open();
+
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = "EXEC sp_set_session_context N'CurrentUserName', @username";
+            var param = cmd.CreateParameter();
+            param.ParameterName = "@username";
+            param.Value = username;
+            cmd.Parameters.Add(param);
+            cmd.ExecuteNonQuery();
+        }
+        catch
+        {
+            // Non-fatal — triggers will fall back to SYSTEM_USER if SESSION_CONTEXT is null
+        }
+    }
 }

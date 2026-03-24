@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using ACGCET_Admin.Services;
 
 namespace ACGCET_Admin.ViewModels.DeleteEntry
 {
@@ -15,7 +16,7 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
 
         [ObservableProperty] private ObservableCollection<ExamSession> _examSessions = new();
         [ObservableProperty] private ExamSession? _selectedSession;
-        
+
         [ObservableProperty] private string _admissionNo = "";
         [ObservableProperty] private string _rollNo = "";
         [ObservableProperty] private string _regNo = "";
@@ -24,7 +25,7 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
         [ObservableProperty] private string _batch = "";
         [ObservableProperty] private string _section = "";
 
-        [ObservableProperty] 
+        [ObservableProperty]
         private ObservableCollection<DeleteExamPaperItem> _paperList = new();
 
         public DeleteExamApplyViewModel(AcgcetDbContext dbContext)
@@ -41,7 +42,7 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
             {
                 var sessions = await _dbContext.ExamSessions.OrderByDescending(s => s.ExamSessionId).ToListAsync();
                 ExamSessions.Clear();
-                foreach(var s in sessions) ExamSessions.Add(s);
+                foreach (var s in sessions) ExamSessions.Add(s);
             }
             catch { /* ignore load errors */ }
         }
@@ -82,7 +83,7 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
         {
             PaperList.Clear();
             if (SelectedSession == null) return;
-            
+
             var exam = await _dbContext.Examinations.FirstOrDefaultAsync(e => e.ExamMonth == SelectedSession.SessionName);
             if (exam == null) return; // Or handle differently
 
@@ -92,7 +93,7 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
 
             if (app != null)
             {
-                foreach(var p in app.ExamApplicationPapers)
+                foreach (var p in app.ExamApplicationPapers)
                 {
                     PaperList.Add(new DeleteExamPaperItem
                     {
@@ -108,6 +109,7 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
         [RelayCommand]
         private async Task Delete()
         {
+            if (!UserPermissionService.Current.CanDelete("EXAM_APPLICATION")) { MessageBox.Show("Access Denied: You do not have permission to delete exam applications.", "RBAC", MessageBoxButton.OK, MessageBoxImage.Warning); return; }
             var selected = PaperList.Where(p => p.IsSelected).ToList();
             if (!selected.Any())
             {
@@ -119,7 +121,7 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
             {
                 var ids = selected.Select(p => p.ExamApplicationPaperId).ToList();
                 var papersToDelete = await _dbContext.ExamApplicationPapers.Where(x => ids.Contains(x.ExamApplicationPaperId)).ToListAsync();
-                
+
                 _dbContext.ExamApplicationPapers.RemoveRange(papersToDelete);
                 await _dbContext.SaveChangesAsync();
 
@@ -127,10 +129,10 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
                 // Let's check
                 if (SelectedSession != null && !string.IsNullOrEmpty(RegNo))
                 {
-                     // Re-loading to check count or just check DB
-                     // Logic: If ExamApplication has 0 papers, delete it?
-                     // Implement simple reload for now
-                     await Search();
+                    // Re-loading to check count or just check DB
+                    // Logic: If ExamApplication has 0 papers, delete it?
+                    // Implement simple reload for now
+                    await Search();
                 }
                 MessageBox.Show("Deleted Successfully");
             }
@@ -158,11 +160,11 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
 
     public partial class DeleteExamPaperItem : ObservableObject
     {
-         public string PaperCode { get; set; } = "";
-         public string PaperName { get; set; } = "";
-         public int ExamApplicationPaperId { get; set; }
-         
-         [ObservableProperty]
-         private bool _isSelected;
+        public string PaperCode { get; set; } = "";
+        public string PaperName { get; set; } = "";
+        public int ExamApplicationPaperId { get; set; }
+
+        [ObservableProperty]
+        private bool _isSelected;
     }
 }

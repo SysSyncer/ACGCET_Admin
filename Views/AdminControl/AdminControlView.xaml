@@ -9,7 +9,8 @@
              xmlns:dashboardViews="clr-namespace:ACGCET_Admin.Views.Dashboard"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=viewmodels:AdminControlViewModel}"
-             d:DesignHeight="700" d:DesignWidth="1100">
+             d:DesignHeight="700"
+        d:DesignWidth="1100">
 
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type viewmodels:NewUserCreationViewModel}">
@@ -24,6 +25,18 @@
         <DataTemplate DataType="{x:Type viewmodels:StudentWiseBarcodeViewModel}">
             <views:StudentWiseBarcodeView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:DataCorrectionManagementViewModel}">
+            <views:DataCorrectionManagementView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:LockOverrideManagementViewModel}">
+            <views:LockOverrideManagementView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:AnomalyManagementViewModel}">
+            <views:AnomalyManagementView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:EntryProgressViewModel}">
+            <views:EntryProgressView/>
+        </DataTemplate>
     </UserControl.Resources>
 
     <Grid Background="#FAFAFA">
@@ -33,81 +46,198 @@
         </Grid.ColumnDefinitions>
 
         <!-- ── Sub-Sidebar ──────────────────────────────────── -->
-        <Border Grid.Column="0" Background="White"
-                BorderThickness="0 0 1 0" BorderBrush="#E4E4E7"
+        <Border Grid.Column="0"
+                Background="White"
+                BorderThickness="0 0 1 0"
+                BorderBrush="#E4E4E7"
                 ClipToBounds="True">
             <DockPanel>
                 <!-- Header -->
                 <Border DockPanel.Dock="Top"
                         Padding="16 16 16 14"
-                        BorderThickness="0 0 0 1" BorderBrush="#E4E4E7">
+                        BorderThickness="0 0 0 1"
+                        BorderBrush="#E4E4E7">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <md:PackIcon Kind="AccountCog" Width="16" Height="16"
-                                         Foreground="#7C3AED" VerticalAlignment="Center"/>
-                            <TextBlock Text="ADMIN CONTROL" FontSize="11" FontWeight="Bold"
-                                       Foreground="#7C3AED" Margin="8 0 0 0" VerticalAlignment="Center"
+                            <md:PackIcon Kind="AccountCog"
+                                    Width="16"
+                                    Height="16"
+                                         Foreground="#7C3AED"
+                                    VerticalAlignment="Center"/>
+                            <TextBlock Text="ADMIN CONTROL"
+                                    FontSize="11"
+                                    FontWeight="Bold"
+                                       Foreground="#7C3AED"
+                                    Margin="8 0 0 0"
+                                    VerticalAlignment="Center"
                                        FontFamily="Segoe UI Variable Display, Segoe UI"/>
                         </StackPanel>
-                        <TextBlock Text="System Administration" FontSize="11"
-                                   Foreground="#71717A" Margin="0 3 0 0"
+                        <TextBlock Text="System Administration"
+                                FontSize="11"
+                                   Foreground="#71717A"
+                                Margin="0 3 0 0"
                                    FontFamily="Segoe UI Variable Display, Segoe UI"/>
                     </StackPanel>
                 </Border>
 
                 <!-- Footer -->
                 <Border DockPanel.Dock="Bottom"
-                        Padding="6 8" BorderThickness="0 1 0 0" BorderBrush="#E4E4E7">
+                        Padding="6 8"
+                        BorderThickness="0 1 0 0"
+                        BorderBrush="#E4E4E7">
                     <Button Style="{StaticResource BackNavButton}"
                             Command="{Binding DataContext.NavigateCommand,
                                 RelativeSource={RelativeSource FindAncestor,
                                 AncestorType={x:Type dashboardViews:DashboardView}}}"
                             CommandParameter="Home">
                         <StackPanel Orientation="Horizontal">
-                            <md:PackIcon Kind="ArrowLeft" Width="15" Height="15"
-                                         Margin="0 0 8 0" VerticalAlignment="Center"
+                            <md:PackIcon Kind="ArrowLeft"
+                                    Width="15"
+                                    Height="15"
+                                         Margin="0 0 8 0"
+                                    VerticalAlignment="Center"
                                          Foreground="#EF4444"/>
-                            <TextBlock Text="Back to Dashboard" VerticalAlignment="Center"/>
+                            <TextBlock Text="Back to Dashboard"
+                                    VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                 </Border>
 
                 <!-- Nav items -->
                 <StackPanel Margin="0 8 0 0">
-                    <TextBlock Text="CONTROL PANEL" FontSize="10" FontWeight="Bold"
-                               Foreground="#A1A1AA" Margin="16 10 0 4"
+                    <TextBlock Text="CONTROL PANEL"
+                            FontSize="10"
+                            FontWeight="Bold"
+                               Foreground="#A1A1AA"
+                            Margin="16 10 0 4"
                                FontFamily="Segoe UI Variable Display, Segoe UI"/>
 
                     <Button Style="{StaticResource SubNavButton}"
-                            Command="{Binding NavigateCommand}" CommandParameter="NewUserCreation">
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="NewUserCreation">
                         <StackPanel Orientation="Horizontal">
-                            <md:PackIcon Kind="AccountPlus" Width="15" Height="15"
-                                         Margin="0 0 10 0" VerticalAlignment="Center" Foreground="#22C55E"/>
-                            <TextBlock Text="New User Creation" VerticalAlignment="Center"/>
+                            <md:PackIcon Kind="AccountPlus"
+                                    Width="15"
+                                    Height="15"
+                                         Margin="0 0 10 0"
+                                    VerticalAlignment="Center"
+                                    Foreground="#22C55E"/>
+                            <TextBlock Text="New User Creation"
+                                    VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     <Button Style="{StaticResource SubNavButton}"
-                            Command="{Binding NavigateCommand}" CommandParameter="ExtMarkEntryBarcode">
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="ExtMarkEntryBarcode">
                         <StackPanel Orientation="Horizontal">
-                            <md:PackIcon Kind="Barcode" Width="15" Height="15"
-                                         Margin="0 0 10 0" VerticalAlignment="Center" Foreground="#3B82F6"/>
-                            <TextBlock Text="Ext. Mark Barcode" VerticalAlignment="Center"/>
+                            <md:PackIcon Kind="Barcode"
+                                    Width="15"
+                                    Height="15"
+                                         Margin="0 0 10 0"
+                                    VerticalAlignment="Center"
+                                    Foreground="#3B82F6"/>
+                            <TextBlock Text="Ext. Mark Barcode"
+                                    VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     <Button Style="{StaticResource SubNavButton}"
-                            Command="{Binding NavigateCommand}" CommandParameter="StudentWiseBarcodeView">
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="StudentWiseBarcodeView">
                         <StackPanel Orientation="Horizontal">
-                            <md:PackIcon Kind="BarcodeScanner" Width="15" Height="15"
-                                         Margin="0 0 10 0" VerticalAlignment="Center" Foreground="#7C3AED"/>
-                            <TextBlock Text="Student Wise Barcode" VerticalAlignment="Center"/>
+                            <md:PackIcon Kind="BarcodeScanner"
+                                    Width="15"
+                                    Height="15"
+                                         Margin="0 0 10 0"
+                                    VerticalAlignment="Center"
+                                    Foreground="#7C3AED"/>
+                            <TextBlock Text="Student Wise Barcode"
+                                    VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     <Button Style="{StaticResource SubNavButton}"
-                            Command="{Binding NavigateCommand}" CommandParameter="DataInputLock">
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="DataInputLock">
                         <StackPanel Orientation="Horizontal">
-                            <md:PackIcon Kind="LockOutline" Width="15" Height="15"
-                                         Margin="0 0 10 0" VerticalAlignment="Center" Foreground="#F97316"/>
-                            <TextBlock Text="Data Input Lock" VerticalAlignment="Center"/>
+                            <md:PackIcon Kind="LockOutline"
+                                    Width="15"
+                                    Height="15"
+                                         Margin="0 0 10 0"
+                                    VerticalAlignment="Center"
+                                    Foreground="#F97316"/>
+                            <TextBlock Text="Data Input Lock"
+                                    VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <TextBlock Text="REQUEST MANAGEMENT"
+                            FontSize="10"
+                            FontWeight="Bold"
+                               Foreground="#A1A1AA"
+                            Margin="16 16 0 4"
+                               FontFamily="Segoe UI Variable Display, Segoe UI"/>
+
+                    <Button Style="{StaticResource SubNavButton}"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="DataCorrection">
+                        <StackPanel Orientation="Horizontal">
+                            <md:PackIcon Kind="FileDocumentEdit"
+                                    Width="15"
+                                    Height="15"
+                                         Margin="0 0 10 0"
+                                    VerticalAlignment="Center"
+                                    Foreground="#C62828"/>
+                            <TextBlock Text="Correction Requests"
+                                    VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource SubNavButton}"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="LockOverride">
+                        <StackPanel Orientation="Horizontal">
+                            <md:PackIcon Kind="LockOpenVariant"
+                                    Width="15"
+                                    Height="15"
+                                         Margin="0 0 10 0"
+                                    VerticalAlignment="Center"
+                                    Foreground="#E65100"/>
+                            <TextBlock Text="Lock Override Requests"
+                                    VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <TextBlock Text="MONITORING"
+                            FontSize="10"
+                            FontWeight="Bold"
+                               Foreground="#A1A1AA"
+                            Margin="16 16 0 4"
+                               FontFamily="Segoe UI Variable Display, Segoe UI"/>
+
+                    <Button Style="{StaticResource SubNavButton}"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="EntryProgress">
+                        <StackPanel Orientation="Horizontal">
+                            <md:PackIcon Kind="ChartBar"
+                                    Width="15"
+                                    Height="15"
+                                         Margin="0 0 10 0"
+                                    VerticalAlignment="Center"
+                                    Foreground="#2563EB"/>
+                            <TextBlock Text="Entry Progress"
+                                    VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource SubNavButton}"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="AnomalyDetection">
+                        <StackPanel Orientation="Horizontal">
+                            <md:PackIcon Kind="ShieldAlert"
+                                    Width="15"
+                                    Height="15"
+                                         Margin="0 0 10 0"
+                                    VerticalAlignment="Center"
+                                    Foreground="#DC2626"/>
+                            <TextBlock Text="Anomaly Detection"
+                                    VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -115,6 +245,8 @@
         </Border>
 
         <!-- ── Content Area ─────────────────────────────────── -->
-        <ContentControl Grid.Column="1" Content="{Binding CurrentAdminView}" Margin="28 24"/>
+        <ContentControl Grid.Column="1"
+                Content="{Binding CurrentAdminView}"
+                Margin="28 24"/>
     </Grid>
 </UserControl>

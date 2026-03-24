@@ -15,13 +15,13 @@ namespace ACGCET_Admin.Views.Application
         public A4ResultPrintView()
         {
             InitializeComponent();
-            
-            this.Loaded += (s, e) => 
+
+            this.Loaded += (s, e) =>
             {
                 WeakReferenceMessenger.Default.Register<PrintA4ResultMessage>(this, OnPrintRequest);
             };
-            
-            this.Unloaded += (s, e) => 
+
+            this.Unloaded += (s, e) =>
             {
                 WeakReferenceMessenger.Default.Unregister<PrintA4ResultMessage>(this);
             };
@@ -37,10 +37,15 @@ namespace ACGCET_Admin.Views.Application
 
                 if (message.IsPreview)
                 {
+                    var reader = new FlowDocumentReader
+                    {
+                        Document = doc,
+                        ViewingMode = FlowDocumentReaderViewingMode.Page
+                    };
                     var window = new Window
                     {
                         Title = "A4 Result Print - Preview",
-                        Content = new DocumentViewer { Document = doc },
+                        Content = reader,
                         Width = 800,
                         Height = 1000,
                         WindowStartupLocation = WindowStartupLocation.CenterScreen

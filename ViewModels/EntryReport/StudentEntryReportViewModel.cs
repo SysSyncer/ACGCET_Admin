@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Collections.Generic;
+using System;
 
 namespace ACGCET_Admin.ViewModels.EntryReport
 {
@@ -17,7 +18,7 @@ namespace ACGCET_Admin.ViewModels.EntryReport
 
         [ObservableProperty] private ObservableCollection<string> _courseLevels = new() { "UG", "PG" };
         [ObservableProperty] private string _selectedCourseLevel = "";
-        
+
         [ObservableProperty] private ObservableCollection<Program> _programs = new();
         [ObservableProperty] private Program? _selectedProgram;
 
@@ -26,6 +27,16 @@ namespace ACGCET_Admin.ViewModels.EntryReport
 
         [ObservableProperty] private ObservableCollection<Section> _sections = new();
         [ObservableProperty] private Section? _selectedSection;
+
+        // Search
+        [ObservableProperty] private string _searchText = string.Empty;
+
+        partial void OnSearchTextChanged(string value)
+        {
+            ApplyFilter();
+        }
+
+        protected abstract void ApplyFilter();
 
         public BaseEntryReportViewModel(AcgcetDbContext dbContext)
         {
@@ -39,16 +50,16 @@ namespace ACGCET_Admin.ViewModels.EntryReport
 
             var progs = await _dbContext.Programs.Include(p => p.Degree).ToListAsync();
             Programs.Clear();
-            foreach(var p in progs) Programs.Add(p);
+            foreach (var p in progs) Programs.Add(p);
         }
 
         async partial void OnSelectedCourseLevelChanged(string value)
         {
-            if(string.IsNullOrEmpty(value)) return;
+            if (string.IsNullOrEmpty(value)) return;
             var programs = await _dbContext.Programs.Include(p => p.Degree)
                 .Where(p => p.Degree != null && p.Degree.GraduationLevel == value).ToListAsync();
-             Programs.Clear();
-             foreach(var p in programs) Programs.Add(p);
+            Programs.Clear();
+            foreach (var p in programs) Programs.Add(p);
         }
 
         async partial void OnSelectedProgramChanged(Program? value)
@@ -56,15 +67,15 @@ namespace ACGCET_Admin.ViewModels.EntryReport
             if (value == null) return;
             var batches = await _dbContext.Batches.Where(b => b.Course!.ProgramId == value.ProgramId).ToListAsync();
             Batches.Clear();
-            foreach(var b in batches) Batches.Add(b);
+            foreach (var b in batches) Batches.Add(b);
         }
 
         async partial void OnSelectedBatchChanged(Batch? value)
         {
-             if (value == null) return;
-             var sections = await _dbContext.Sections.Where(s => s.BatchId == value.BatchId).ToListAsync();
-             Sections.Clear();
-             foreach(var s in sections) Sections.Add(s);
+            if (value == null) return;
+            var sections = await _dbContext.Sections.Where(s => s.BatchId == value.BatchId).ToListAsync();
+            Sections.Clear();
+            foreach (var s in sections) Sections.Add(s);
         }
 
         [RelayCommand]
@@ -74,9 +85,10 @@ namespace ACGCET_Admin.ViewModels.EntryReport
         public void Clear()
         {
             SelectedCourseLevel = string.Empty;
-            SelectedProgram = null; 
+            SelectedProgram = null;
             SelectedBatch = null;
             SelectedSection = null;
+            SearchText = string.Empty;
             ClearData();
         }
 
@@ -96,32 +108,44 @@ namespace ACGCET_Admin.ViewModels.EntryReport
     public partial class StudentEntryReportViewModel : BaseEntryReportViewModel
     {
         [ObservableProperty] private ObservableCollection<StudentEntryItem> _reportData = new();
+        private List<StudentEntryItem> _allReportData = new();
 
         public StudentEntryReportViewModel(AcgcetDbContext dbContext) : base(dbContext) { }
 
         public override async Task View()
         {
-            if(SelectedBatch == null) { MessageBox.Show("Select Batch"); return; }
-            
+            if (SelectedBatch == null) { MessageBox.Show("Select Batch"); return; }
+
             var query = _dbContext.Students.Include(s => s.Regulation).AsQueryable();
             if (SelectedBatch != null) query = query.Where(s => s.BatchId == SelectedBatch.BatchId);
             if (SelectedSection != null) query = query.Where(s => s.SectionId == SelectedSection.SectionId);
-            if (SelectedProgram != null) query = query.Where(s => s.Course!.ProgramId == SelectedProgram.ProgramId); 
-            
+            if (SelectedProgram != null) query = query.Where(s => s.Course!.ProgramId == SelectedProgram.ProgramId);
+
             var students = await query.ToListAsync();
-            ReportData.Clear();
-            foreach(var s in students)
+            _allReportData = students.Select(s => new StudentEntryItem
             {
-                ReportData.Add(new StudentEntryItem 
-                {
-                    AdmissionNo = s.AdmissionNumber,
-                    RollNo = s.RollNumber,
-                    RegNo = s.RegistrationNumber,
-                    StudentName = s.FullName,
-                    RegulationName = s.Regulation?.RegulationName ?? "N/A",
-                    EntryPerson = s.CreatedBy ?? "Unknown"
-                });
-            }
+                AdmissionNo = s.AdmissionNumber,
+                RollNo = s.RollNumber,
+                RegNo = s.RegistrationNumber,
+                StudentName = s.FullName,
+                RegulationName = s.Regulation?.RegulationName ?? "N/A",
+                EntryPerson = s.CreatedBy ?? "Unknown"
+            }).ToList();
+            SearchText = string.Empty;
+            ApplyFilter();
+        }
+
+        protected override void ApplyFilter()
+        {
+            var filtered = string.IsNullOrWhiteSpace(SearchText)
+                ? _allReportData
+                : _allReportData.Where(x =>
+                    (x.RegNo?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (x.StudentName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (x.AdmissionNo?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (x.RollNo?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false))
+                .ToList();
+            ReportData = new ObservableCollection<StudentEntryItem>(filtered);
         }
 
         [RelayCommand]
@@ -132,10 +156,10 @@ namespace ACGCET_Admin.ViewModels.EntryReport
 
             var printService = new Services.PrintService();
             printService.GenerateStudentReport(
-                ReportData, 
-                SelectedProgram?.Degree?.DegreeName ?? "Degree", 
-                SelectedProgram?.ProgramName ?? "Program", 
-                SelectedBatch.BatchName, 
+                ReportData,
+                SelectedProgram?.Degree?.DegreeName ?? "Degree",
+                SelectedProgram?.ProgramName ?? "Program",
+                SelectedBatch.BatchName,
                 SelectedSection?.SectionName ?? "All"
             );
         }
@@ -147,7 +171,11 @@ namespace ACGCET_Admin.ViewModels.EntryReport
             Preview();
         }
 
-        protected override void ClearData() => ReportData.Clear();
+        protected override void ClearData()
+        {
+            _allReportData.Clear();
+            ReportData.Clear();
+        }
 
         [RelayCommand]
         private async Task RefreshAsync()

@@ -4,6 +4,9 @@ using ACGCET_Admin.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
+using System;
+using System.Collections.Generic;
 
 namespace ACGCET_Admin.ViewModels.MissingEntry
 {
@@ -18,6 +21,10 @@ namespace ACGCET_Admin.ViewModels.MissingEntry
         [ObservableProperty] private Paper? _selectedPaper;
         [ObservableProperty] private ObservableCollection<MissingEntryItem> _reportData = new();
         [ObservableProperty] private bool _isLoading;
+        private List<MissingEntryItem> _allReportData = new();
+
+        [ObservableProperty] private string _searchText = string.Empty;
+        partial void OnSearchTextChanged(string value) => ApplyFilter();
 
         public MissingResultEntryViewModel(AcgcetDbContext dbContext)
         {
@@ -32,13 +39,13 @@ namespace ACGCET_Admin.ViewModels.MissingEntry
             for (int i = 1; i <= 8; i++) Semesters.Add(i.ToString());
             LoadPapers();
         }
-         private void LoadPapers()
+        private void LoadPapers()
         {
             var papers = _dbContext.Papers.Include(p => p.Course).OrderBy(p => p.PaperCode).Take(500).ToList();
             Papers.Clear();
             foreach (var p in papers) Papers.Add(p);
         }
-         partial void OnSelectedSemesterChanged(string value) { LoadPapers(); }
+        partial void OnSelectedSemesterChanged(string value) { LoadPapers(); }
 
         [RelayCommand]
         private async Task Search()
@@ -46,6 +53,7 @@ namespace ACGCET_Admin.ViewModels.MissingEntry
             if (IsLoading) return;
             IsLoading = true;
             ReportData.Clear();
+            _allReportData.Clear();
             try
             {
                 if (SelectedSession == null) return;
@@ -61,8 +69,8 @@ namespace ACGCET_Admin.ViewModels.MissingEntry
                 if (SelectedPaper != null) query = query.Where(x => x.PaperId == SelectedPaper.PaperId);
                 else if (!string.IsNullOrEmpty(SelectedSemester))
                 {
-                     int sem = int.Parse(SelectedSemester);
-                     query = query.Where(x => x.Paper!.Semester == sem);
+                    int sem = int.Parse(SelectedSemester);
+                    query = query.Where(x => x.Paper!.Semester == sem);
                 }
 
                 var apps = await query.ToListAsync();
@@ -70,25 +78,49 @@ namespace ACGCET_Admin.ViewModels.MissingEntry
 
                 foreach (var app in apps)
                 {
-                     // Missing Result: No ExamResult record found
-                     bool hasResult = results.Any(r => r.StudentId == app.ExamApplication!.StudentId && r.PaperId == app.PaperId);
-                     
-                     if (!hasResult)
-                     {
-                         ReportData.Add(new MissingEntryItem
-                         {
-                             RegNo = app.ExamApplication!.Student!.RegistrationNumber ?? "",
-                             StudentName = app.ExamApplication.Student.FullName ?? "",
-                             PaperCode = app.Paper!.PaperCode ?? "",
-                             Status = "Missing Result",
-                             Course = ""
-                         });
-                     }
+                    // Missing Result: No ExamResult record found
+                    bool hasResult = results.Any(r => r.StudentId == app.ExamApplication!.StudentId && r.PaperId == app.PaperId);
+
+                    if (!hasResult)
+                    {
+                        _allReportData.Add(new MissingEntryItem
+                        {
+                            RegNo = app.ExamApplication!.Student!.RegistrationNumber ?? "",
+                            StudentName = app.ExamApplication.Student.FullName ?? "",
+                            PaperCode = app.Paper!.PaperCode ?? "",
+                            Status = "Missing Result",
+                            Course = ""
+                        });
+                    }
                 }
+                SearchText = string.Empty;
+                ApplyFilter();
             }
             finally { IsLoading = false; }
         }
-        [RelayCommand] private void Print() {}
+
+        private void ApplyFilter()
+        {
+            var filtered = string.IsNullOrWhiteSpace(SearchText)
+                ? _allReportData
+                : _allReportData.Where(x =>
+                    (x.RegNo?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (x.StudentName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (x.PaperCode?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false))
+                .ToList();
+            ReportData = new ObservableCollection<MissingEntryItem>(filtered);
+        }
+        [RelayCommand]
+        private void Print()
+        {
+            if (ReportData == null || ReportData.Count == 0)
+            {
+                MessageBox.Show("No data to print. Please search first.", "Print", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            var printService = new Services.PrintService();
+            printService.GenerateMissingEntryReport(ReportData, "Missing Result Entry Report");
+        }
 
         [RelayCommand]
         private async Task RefreshAsync()

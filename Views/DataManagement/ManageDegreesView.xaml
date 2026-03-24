@@ -1,0 +1,97 @@
+<UserControl x:Class="ACGCET_Admin.Views.DataManagement.ManageDegreesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:vm="clr-namespace:ACGCET_Admin.ViewModels.DataManagement"
+             d:DataContext="{d:DesignInstance Type=vm:ManageDegreesViewModel}"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d">
+    <StackPanel>
+        <TextBlock Text="Manage Degrees"
+                FontSize="20"
+                FontWeight="SemiBold"
+                Foreground="#09090B"
+                Margin="0 0 0 18"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="380"/>
+                <ColumnDefinition Width="24"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Form -->
+            <Border Grid.Column="0"
+                    Background="White"
+                    BorderThickness="1"
+                    BorderBrush="#E4E4E7"
+                    Padding="20">
+                <StackPanel>
+                    <TextBlock Text="Add New Degree"
+                            FontSize="14"
+                            FontWeight="SemiBold"
+                            Foreground="#09090B"
+                            Margin="0 0 0 16"/>
+                    <TextBox Text="{Binding DegreeName, UpdateSourceTrigger=PropertyChanged}"
+                            Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             md:HintAssist.Hint="Degree Name"
+                            Margin="0 0 0 12"/>
+                    <TextBox Text="{Binding DegreeCode, UpdateSourceTrigger=PropertyChanged}"
+                            Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             md:HintAssist.Hint="Degree Code"
+                            Margin="0 0 0 12"/>
+                    <ComboBox ItemsSource="{Binding GraduationLevels}"
+                            SelectedItem="{Binding GraduationLevel}"
+                              Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                            md:HintAssist.Hint="Graduation Level"
+                            Margin="0 0 0 20"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Save"
+                                Command="{Binding SaveCommand}"
+                                Style="{StaticResource PrimaryButton}"
+                                Width="100"/>
+                        <Button Content="Clear"
+                                Command="{Binding ClearCommand}"
+                                Style="{StaticResource SubtleButton}"
+                                Width="80"
+                                Margin="8 0 0 0"/>
+                        <Button Content="Delete"
+                                Command="{Binding DeleteCommand}"
+                                Style="{StaticResource DangerButton}"
+                                Width="90"
+                                Margin="8 0 0 0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Grid -->
+            <Border Grid.Column="2"
+                    Background="White"
+                    BorderThickness="1"
+                    BorderBrush="#E4E4E7">
+                <DataGrid ItemsSource="{Binding Degrees}"
+                        SelectedItem="{Binding SelectedDegree}"
+                          AutoGenerateColumns="False"
+                        CanUserAddRows="False"
+                        IsReadOnly="True"
+                          HeadersVisibility="Column"
+                        BorderThickness="0">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID"
+                                Binding="{Binding DegreeId}"
+                                Width="50"/>
+                        <DataGridTextColumn Header="Name"
+                                Binding="{Binding DegreeName}"
+                                Width="*"/>
+                        <DataGridTextColumn Header="Code"
+                                Binding="{Binding DegreeCode}"
+                                Width="100"/>
+                        <DataGridTextColumn Header="Level"
+                                Binding="{Binding GraduationLevel}"
+                                Width="100"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+        </Grid>
+    </StackPanel>
+</UserControl>

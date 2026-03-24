@@ -275,7 +275,7 @@ The application connects to a SQL Server database named **`ACGCET_MASTER`**. Her
 | `LockOverrideRequests` | A department user can request to unlock a module temporarily |
 | `DeadlineConfiguration` | Deadline date/time for each module per examination, with optional extension |
 | `AuditLog` | Every data change is logged here — who did what, when, on which table/record |
-| `MalpracticeDetectionLogs` | Suspicious activity logs — multiple identical marks, etc. |
+| `AnomalyDetectionLogs` | Suspicious activity logs — multiple identical marks, etc. |
 | `SystemAlerts` | System alerts shown on the dashboard |
 | `SystemConfigurations` | Key-value settings for the application |
 
@@ -1195,3 +1195,4 @@ private async Task Delete()
 ---
 
 *This guide was written to help new developers understand the ACGCET_Admin_V2 project. If you have questions about a specific screen or feature not covered here, trace it from the View (.xaml) → find the ViewModel via `DataContext` → follow the `[RelayCommand]` methods and `[ObservableProperty]` data to understand the flow.*
+

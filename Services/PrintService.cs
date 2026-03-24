@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using ACGCET_Admin.ViewModels.EntryReport;
 using ACGCET_Admin.ViewModels.Application;
+using ACGCET_Admin.ViewModels.MissingEntry;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -20,24 +22,29 @@ namespace ACGCET_Admin.Services
         }
 
         // ── Logo Helpers ────────────────────────────────────────────────────
-        private static byte[] LoadImageFromFile(string relativePath)
+        // Images are compiled as WPF Resources (pack URI) — load via Application.GetResourceStream
+        private static byte[] LoadImageFromResource(string packRelativePath)
         {
             try
             {
-                var basePath = AppDomain.CurrentDomain.BaseDirectory;
-                var fullPath = Path.Combine(basePath, relativePath);
-                if (File.Exists(fullPath))
-                    return File.ReadAllBytes(fullPath);
+                var uri = new Uri($"pack://application:,,,/{packRelativePath}");
+                var info = Application.GetResourceStream(uri);
+                if (info?.Stream != null)
+                {
+                    using var ms = new MemoryStream();
+                    info.Stream.CopyTo(ms);
+                    return ms.ToArray();
+                }
             }
             catch { }
             return Array.Empty<byte>();
         }
 
         private byte[] GetAcgcetLogo() =>
-            LoadImageFromFile(Path.Combine("Resources", "Images", "acgcet_logo.png"));
+            LoadImageFromResource("Resources/Images/acgcet_logo.png");
 
         private byte[] GetTNLogo() =>
-            LoadImageFromFile(Path.Combine("Resources", "Images", "accet_logo_1.png"));
+            LoadImageFromResource("Resources/Images/accet_logo_1.png");
 
         // ── Header ──────────────────────────────────────────────────────────
         private void ComposeHeader(IContainer container, string reportTitle)
@@ -455,6 +462,125 @@ namespace ACGCET_Admin.Services
             }, "DynamicReport");
         }
 
+        public void GenerateDataTableReport(
+            DataView dataView,
+            string reportTitle = "Report")
+        {
+            if (dataView == null || dataView.Count == 0) return;
+            var dt = dataView.Table!;
+
+            GenerateAndOpenPdf(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4.Landscape());
+                    page.Margin(20, Unit.Point);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontSize(7).FontFamily("Arial"));
+
+                    page.Header().Column(col =>
+                    {
+                        ComposeHeader(col.Item(), reportTitle);
+                        col.Item().LineHorizontal(0.5f).LineColor(Colors.Grey.Lighten2);
+                    });
+
+                    page.Content().PaddingTop(6).Table(table =>
+                    {
+                        table.ColumnsDefinition(cols =>
+                        {
+                            foreach (DataColumn dc in dt.Columns)
+                            {
+                                if (dc.ColumnName == "SNo")
+                                    cols.ConstantColumn(24);
+                                else if (dc.ColumnName == "RegNo" || dc.ColumnName == "Name")
+                                    cols.RelativeColumn(2);
+                                else
+                                    cols.RelativeColumn(1);
+                            }
+                        });
+
+                        table.Header(header =>
+                        {
+                            foreach (DataColumn dc in dt.Columns)
+                                header.Cell().Element(c => HeaderCell(c))
+                                      .Text(dc.ColumnName).FontColor(Colors.White).Bold().FontSize(7);
+                        });
+
+                        int sno = 1;
+                        foreach (DataRowView drv in dataView)
+                        {
+                            bool alt = sno % 2 == 0;
+                            foreach (DataColumn dc in dt.Columns)
+                            {
+                                var val = drv[dc.ColumnName]?.ToString() ?? "-";
+                                table.Cell().Element(c => DataCell(c, alt)).Text(val);
+                            }
+                            sno++;
+                        }
+                    });
+
+                    ComposeFooter(page.Footer());
+                });
+            }, "DataTableReport");
+        }
+
+        public void GenerateMissingEntryReport(
+            IEnumerable<MissingEntryItem> data,
+            string reportTitle = "Missing Entry Report")
+        {
+            GenerateAndOpenPdf(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4);
+                    page.Margin(36, Unit.Point);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontSize(10).FontFamily("Arial"));
+
+                    page.Header().Column(col =>
+                    {
+                        ComposeHeader(col.Item(), reportTitle);
+                        col.Item().LineHorizontal(0.5f).LineColor(Colors.Grey.Lighten2);
+                    });
+
+                    page.Content().PaddingTop(8).Table(table =>
+                    {
+                        table.ColumnsDefinition(cols =>
+                        {
+                            cols.ConstantColumn(32);  // SNo
+                            cols.RelativeColumn(2);   // RegNo
+                            cols.RelativeColumn(4);   // Name
+                            cols.RelativeColumn(2);   // PaperCode
+                            cols.RelativeColumn(2);   // Course
+                            cols.RelativeColumn(2);   // Status
+                        });
+
+                        table.Header(header =>
+                        {
+                            foreach (var h in new[] { "S.No", "Reg. No", "Student Name", "Paper Code", "Course", "Status" })
+                                header.Cell().Element(c => HeaderCell(c))
+                                      .Text(h).FontColor(Colors.White).Bold().FontSize(10);
+                        });
+
+                        int sno = 1;
+                        foreach (var item in data)
+                        {
+                            bool alt = sno % 2 == 0;
+                            table.Cell().Element(c => DataCell(c, alt)).AlignRight().Text(sno.ToString());
+                            table.Cell().Element(c => DataCell(c, alt)).Text(item.RegNo);
+                            table.Cell().Element(c => DataCell(c, alt)).Text(item.StudentName);
+                            table.Cell().Element(c => DataCell(c, alt)).Text(item.PaperCode);
+                            table.Cell().Element(c => DataCell(c, alt)).Text(item.Course);
+                            table.Cell().Element(c => DataCell(c, alt)).Text(item.Status);
+                            sno++;
+                        }
+                    });
+
+                    ComposeFooter(page.Footer());
+                });
+            }, "MissingEntryReport");
+        }
+
         private static void ComposeFooter(IContainer footer)
         {
             footer.PaddingTop(4).BorderTop(0.5f).BorderColor(Colors.Grey.Lighten2)
@@ -477,8 +603,8 @@ namespace ACGCET_Admin.Services
 
     public class PrintColumnDefinition
     {
-        public string Header      { get; set; } = string.Empty;
+        public string Header { get; set; } = string.Empty;
         public string BindingPath { get; set; } = string.Empty;
-        public double Width       { get; set; } = 100;
+        public double Width { get; set; } = 100;
     }
 }

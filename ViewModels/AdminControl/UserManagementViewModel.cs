@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,36 +15,41 @@ namespace ACGCET_Admin.ViewModels.AdminControl
     /// <summary>Display model for the user management grid.</summary>
     public class AdminUserDisplay
     {
-        public int    AdminUserId  { get; set; }
-        public string UserName     { get; set; } = string.Empty;
-        public string FullName     { get; set; } = string.Empty;
-        public string Email        { get; set; } = string.Empty;
-        public string Department   { get; set; } = string.Empty;
-        public string Designation  { get; set; } = string.Empty;
-        public string Roles        { get; set; } = string.Empty;
-        public bool   IsActive     { get; set; }
-        public bool   IsLocked     { get; set; }
+        public int AdminUserId { get; set; }
+        public string UserName { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Department { get; set; } = string.Empty;
+        public string Designation { get; set; } = string.Empty;
+        public string Roles { get; set; } = string.Empty;
+        public bool IsActive { get; set; }
+        public bool IsLocked { get; set; }
         public DateTime? CreatedDate { get; set; }
     }
 
     public partial class UserManagementViewModel : ObservableObject
     {
         private readonly AcgcetDbContext _db;
-        private readonly AdminUser?      _currentUser;
+        private readonly AdminUser? _currentUser;
 
         [ObservableProperty] private ObservableCollection<AdminUserDisplay> _users = new();
-        [ObservableProperty] private ObservableCollection<Role>             _availableRoles = new();
-        [ObservableProperty] private AdminUserDisplay?                       _selectedUser;
+        [ObservableProperty] private ObservableCollection<Role> _availableRoles = new();
+        [ObservableProperty] private AdminUserDisplay? _selectedUser;
+        private List<AdminUserDisplay> _allUsers = new();
+
+        // Search
+        [ObservableProperty] private string _searchText = string.Empty;
+        partial void OnSearchTextChanged(string value) => ApplyFilter();
 
         // ── Add-User Form State ───────────────────────
         [ObservableProperty] private bool _isAddingUser;
-        [ObservableProperty] private string _newFullName    = string.Empty;
-        [ObservableProperty] private string _newUsername    = string.Empty;
-        [ObservableProperty] private string _newEmail       = string.Empty;
-        [ObservableProperty] private string _newPassword    = string.Empty;
-        [ObservableProperty] private string _newDepartment  = string.Empty;
+        [ObservableProperty] private string _newFullName = string.Empty;
+        [ObservableProperty] private string _newUsername = string.Empty;
+        [ObservableProperty] private string _newEmail = string.Empty;
+        [ObservableProperty] private string _newPassword = string.Empty;
+        [ObservableProperty] private string _newDepartment = string.Empty;
         [ObservableProperty] private string _newDesignation = string.Empty;
-        [ObservableProperty] private Role?  _newRole;
+        [ObservableProperty] private Role? _newRole;
 
         // ── UI State ──────────────────────────────────
         [ObservableProperty]
@@ -51,12 +57,12 @@ namespace ACGCET_Admin.ViewModels.AdminControl
         private bool _isLoading;
         public bool IsNotLoading => !IsLoading;
 
-        [ObservableProperty] private string _statusMessage  = string.Empty;
-        [ObservableProperty] private bool   _isStatusError;
+        [ObservableProperty] private string _statusMessage = string.Empty;
+        [ObservableProperty] private bool _isStatusError;
 
         public UserManagementViewModel(AcgcetDbContext db, AdminUser? currentUser)
         {
-            _db          = db;
+            _db = db;
             _currentUser = currentUser;
             _ = LoadAsync();
         }
@@ -88,21 +94,36 @@ namespace ACGCET_Admin.ViewModels.AdminControl
 
             var display = users.Select(u => new AdminUserDisplay
             {
-                AdminUserId  = u.AdminUserId,
-                UserName     = u.UserName,
-                FullName     = u.FullName    ?? string.Empty,
-                Email        = u.Email       ?? string.Empty,
-                Department   = u.Department  ?? string.Empty,
-                Designation  = u.Designation ?? string.Empty,
-                Roles        = string.Join(", ", u.AdminUserRoles
+                AdminUserId = u.AdminUserId,
+                UserName = u.UserName,
+                FullName = u.FullName ?? string.Empty,
+                Email = u.Email ?? string.Empty,
+                Department = u.Department ?? string.Empty,
+                Designation = u.Designation ?? string.Empty,
+                Roles = string.Join(", ", u.AdminUserRoles
                                                    .Where(r => r.Role != null)
                                                    .Select(r => r.Role!.RoleName)),
-                IsActive     = u.IsActive  ?? true,
-                IsLocked     = u.IsLocked  ?? false,
-                CreatedDate  = u.CreatedDate
+                IsActive = u.IsActive ?? true,
+                IsLocked = u.IsLocked ?? false,
+                CreatedDate = u.CreatedDate
             }).ToList();
 
-            Users = new ObservableCollection<AdminUserDisplay>(display);
+            _allUsers = display;
+            ApplyFilter();
+        }
+
+        private void ApplyFilter()
+        {
+            var filtered = string.IsNullOrWhiteSpace(SearchText)
+                ? _allUsers
+                : _allUsers.Where(u =>
+                    u.FullName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                    u.UserName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                    u.Email.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                    u.Department.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                    u.Roles.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            Users = new ObservableCollection<AdminUserDisplay>(filtered);
         }
 
         // ── Add User ──────────────────────────────────
@@ -111,7 +132,7 @@ namespace ACGCET_Admin.ViewModels.AdminControl
         {
             NewFullName = NewUsername = NewEmail = NewPassword =
             NewDepartment = NewDesignation = string.Empty;
-            NewRole      = AvailableRoles.FirstOrDefault();
+            NewRole = AvailableRoles.FirstOrDefault();
             IsAddingUser = true;
             StatusMessage = string.Empty;
         }
@@ -119,7 +140,7 @@ namespace ACGCET_Admin.ViewModels.AdminControl
         [RelayCommand]
         private void CancelAdd()
         {
-            IsAddingUser  = false;
+            IsAddingUser = false;
             StatusMessage = string.Empty;
         }
 
@@ -157,16 +178,16 @@ namespace ACGCET_Admin.ViewModels.AdminControl
 
                 var newUser = new AdminUser
                 {
-                    UserName     = NewUsername.Trim(),
+                    UserName = NewUsername.Trim(),
                     PasswordHash = hash,
-                    FullName     = NewFullName.Trim(),
-                    Email        = NewEmail.Trim(),
-                    Department   = NewDepartment.Trim(),
-                    Designation  = NewDesignation.Trim(),
-                    IsActive     = true,
-                    IsLocked     = false,
+                    FullName = NewFullName.Trim(),
+                    Email = NewEmail.Trim(),
+                    Department = NewDepartment.Trim(),
+                    Designation = NewDesignation.Trim(),
+                    IsActive = true,
+                    IsLocked = false,
                     FailedLoginAttempts = 0,
-                    CreatedDate  = DateTime.Now
+                    CreatedDate = DateTime.Now
                 };
 
                 _db.AdminUsers.Add(newUser);
@@ -176,9 +197,9 @@ namespace ACGCET_Admin.ViewModels.AdminControl
                 {
                     _db.AdminUserRoles.Add(new AdminUserRole
                     {
-                        AdminUserId  = newUser.AdminUserId,
-                        RoleId       = NewRole.RoleId,
-                        AssignedBy   = _currentUser?.UserName,
+                        AdminUserId = newUser.AdminUserId,
+                        RoleId = NewRole.RoleId,
+                        AssignedBy = _currentUser?.UserName,
                         AssignedDate = DateTime.Now
                     });
                     await _db.SaveChangesAsync();
@@ -268,8 +289,8 @@ namespace ACGCET_Admin.ViewModels.AdminControl
                 var entity = await _db.AdminUsers.FindAsync(user.AdminUserId);
                 if (entity == null) return;
 
-                entity.IsLocked              = false;
-                entity.FailedLoginAttempts   = 0;
+                entity.IsLocked = false;
+                entity.FailedLoginAttempts = 0;
                 await _db.SaveChangesAsync();
 
                 ShowStatus($"Account '{user.UserName}' unlocked.", false);

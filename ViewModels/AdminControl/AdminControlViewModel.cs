@@ -19,10 +19,10 @@ namespace ACGCET_Admin.ViewModels.AdminControl
             CurrentAdminView = new NewUserCreationViewModel(_dbContext);
         }
 
-        public AdminControlViewModel() 
+        public AdminControlViewModel()
         {
             _dbContext = null!;
-            _currentAdminView = new NewUserCreationViewModel(null!); 
+            _currentAdminView = new NewUserCreationViewModel(null!);
         }
 
         [RelayCommand]
@@ -42,11 +42,19 @@ namespace ACGCET_Admin.ViewModels.AdminControl
                 case "DataInputLock":
                     CurrentAdminView = new DataInputLockViewModel(_dbContext);
                     break;
+                case "DataCorrection":
+                    CurrentAdminView = new DataCorrectionManagementViewModel(_dbContext);
+                    break;
+                case "LockOverride":
+                    CurrentAdminView = new LockOverrideManagementViewModel(_dbContext);
+                    break;
+                case "AnomalyDetection":
+                    CurrentAdminView = new AnomalyManagementViewModel(_dbContext);
+                    break;
+                case "EntryProgress":
+                    CurrentAdminView = new EntryProgressViewModel(_dbContext);
+                    break;
                 case "Close":
-                    // Handled by Dashboard Navigation or specific close logic
-                    // Usually "Back" goes to Dashboard Home?
-                    // We can send a message to Dashboard?
-                    // Or just let User use Dashboard Sidebar.
                     break;
             }
         }

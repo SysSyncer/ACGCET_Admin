@@ -4,6 +4,9 @@ using ACGCET_Admin.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
+using System;
+using System.Collections.Generic;
 
 namespace ACGCET_Admin.ViewModels.MissingEntry
 {
@@ -30,6 +33,12 @@ namespace ACGCET_Admin.ViewModels.MissingEntry
         [ObservableProperty]
         private bool _isLoading;
 
+        private List<MissingEntryItem> _allReportData = new();
+
+        [ObservableProperty]
+        private string _searchText = string.Empty;
+        partial void OnSearchTextChanged(string value) => ApplyFilter();
+
         public MissingExternalEntryViewModel(AcgcetDbContext dbContext)
         {
             _dbContext = dbContext;
@@ -42,7 +51,7 @@ namespace ACGCET_Admin.ViewModels.MissingEntry
             foreach (var s in sessions) ExamSessions.Add(s);
 
             for (int i = 1; i <= 8; i++) Semesters.Add(i.ToString());
-            
+
             LoadPapers();
         }
 
@@ -53,17 +62,17 @@ namespace ACGCET_Admin.ViewModels.MissingEntry
             foreach (var p in papers) Papers.Add(p);
         }
 
-         partial void OnSelectedSemesterChanged(string value)
+        partial void OnSelectedSemesterChanged(string value)
         {
-             if (!string.IsNullOrEmpty(value) && int.TryParse(value, out int sem))
-             {
-                 var papers = _dbContext.Papers
-                    .Where(p => p.Semester == sem)
-                    .OrderBy(p => p.PaperCode)
-                    .ToList();
-                 Papers.Clear();
-                 foreach(var p in papers) Papers.Add(p);
-             }
+            if (!string.IsNullOrEmpty(value) && int.TryParse(value, out int sem))
+            {
+                var papers = _dbContext.Papers
+                   .Where(p => p.Semester == sem)
+                   .OrderBy(p => p.PaperCode)
+                   .ToList();
+                Papers.Clear();
+                foreach (var p in papers) Papers.Add(p);
+            }
         }
 
         [RelayCommand]
@@ -72,11 +81,12 @@ namespace ACGCET_Admin.ViewModels.MissingEntry
             if (IsLoading) return;
             IsLoading = true;
             ReportData.Clear();
+            _allReportData.Clear();
 
             try
             {
                 if (SelectedSession == null) return;
-                
+
                 var exam = await _dbContext.Examinations.FirstOrDefaultAsync(e => e.ExamMonth == SelectedSession.SessionName);
                 if (exam == null) return;
 
@@ -91,35 +101,37 @@ namespace ACGCET_Admin.ViewModels.MissingEntry
                 {
                     query = query.Where(x => x.PaperId == SelectedPaper.PaperId);
                 }
-                
+
                 if (SelectedPaper == null && !string.IsNullOrEmpty(SelectedSemester))
                 {
-                     int sem = int.Parse(SelectedSemester);
-                     query = query.Where(x => x.Paper!.Semester == sem);
+                    int sem = int.Parse(SelectedSemester);
+                    query = query.Where(x => x.Paper!.Semester == sem);
                 }
 
                 var apps = await query.ToListAsync();
-                
+
                 var externalMarks = await _dbContext.ExternalMarks
                     .Where(em => em.ExaminationId == exam.ExaminationId)
                     .ToListAsync();
 
                 foreach (var app in apps)
                 {
-                     bool exists = externalMarks.Any(em => em.StudentId == app.ExamApplication!.StudentId && em.PaperId == app.PaperId);
-                     
-                     if (!exists)
-                     {
-                         ReportData.Add(new MissingEntryItem
-                         {
-                             RegNo = app.ExamApplication!.Student!.RegistrationNumber ?? "",
-                             StudentName = app.ExamApplication.Student.FullName ?? "",
-                             PaperCode = app.Paper!.PaperCode ?? "",
-                             Status = "Missing External",
-                             Course = ""
-                         });
-                     }
+                    bool exists = externalMarks.Any(em => em.StudentId == app.ExamApplication!.StudentId && em.PaperId == app.PaperId);
+
+                    if (!exists)
+                    {
+                        _allReportData.Add(new MissingEntryItem
+                        {
+                            RegNo = app.ExamApplication!.Student!.RegistrationNumber ?? "",
+                            StudentName = app.ExamApplication.Student.FullName ?? "",
+                            PaperCode = app.Paper!.PaperCode ?? "",
+                            Status = "Missing External",
+                            Course = ""
+                        });
+                    }
                 }
+                SearchText = string.Empty;
+                ApplyFilter();
             }
             finally
             {
@@ -127,8 +139,29 @@ namespace ACGCET_Admin.ViewModels.MissingEntry
             }
         }
 
+        private void ApplyFilter()
+        {
+            var filtered = string.IsNullOrWhiteSpace(SearchText)
+                ? _allReportData
+                : _allReportData.Where(x =>
+                    (x.RegNo?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (x.StudentName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (x.PaperCode?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false))
+                .ToList();
+            ReportData = new ObservableCollection<MissingEntryItem>(filtered);
+        }
+
         [RelayCommand]
-        private void Print() {}
+        private void Print()
+        {
+            if (ReportData == null || ReportData.Count == 0)
+            {
+                MessageBox.Show("No data to print. Please search first.", "Print", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            var printService = new Services.PrintService();
+            printService.GenerateMissingEntryReport(ReportData, "Missing External Mark Entry Report");
+        }
 
         [RelayCommand]
         private async Task RefreshAsync()

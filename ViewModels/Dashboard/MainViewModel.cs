@@ -11,36 +11,32 @@ using Microsoft.EntityFrameworkCore;
 namespace ACGCET_Admin.ViewModels.Dashboard
 {
     public partial class MainViewModel : ObservableObject,
-        IRecipient<LoginSuccessMessage>,
-        IRecipient<NavigateToForgotPasswordMessage>,
-        IRecipient<ResetPasswordCompleteMessage>
+        IRecipient<LoginSuccessMessage>
     {
         private readonly AcgcetDbContext _db;
-        private readonly LoginViewModel  _loginVm;
-        private readonly EmailService    _email;
+        private readonly LoginViewModel _loginVm;
+        private readonly UserPermissionService _permissionService;
 
         [ObservableProperty] private string _windowTitle = "ACGCET Admin — COE Portal";
         [ObservableProperty] private object _currentView = new object();
 
         public bool IsSuperAdmin { get; private set; }
-        public bool IsCOE        { get; private set; }
-        public bool IsFaculty    { get; private set; }
+        public bool IsCOE { get; private set; }
+        public bool IsFaculty { get; private set; }
 
-        public MainViewModel(AcgcetDbContext db, LoginViewModel loginVm, EmailService email)
+        public MainViewModel(AcgcetDbContext db, LoginViewModel loginVm, UserPermissionService permissionService)
         {
-            _db      = db;
+            _db = db;
             _loginVm = loginVm;
-            _email   = email;
+            _permissionService = permissionService;
 
             CurrentView = _loginVm;
 
             WeakReferenceMessenger.Default.Register<LoginSuccessMessage>(this);
-            WeakReferenceMessenger.Default.Register<NavigateToForgotPasswordMessage>(this);
-            WeakReferenceMessenger.Default.Register<ResetPasswordCompleteMessage>(this);
             WeakReferenceMessenger.Default.Register<LogoutMessage>(this, (_, m) => Receive(m));
         }
 
-        public MainViewModel() { _db = null!; _loginVm = null!; _email = null!; }
+        public MainViewModel() { _db = null!; _loginVm = null!; _permissionService = null!; }
 
         [RelayCommand]
         private static void Exit() => System.Windows.Application.Current.Shutdown();
@@ -56,10 +52,11 @@ namespace ACGCET_Admin.ViewModels.Dashboard
                     .ToListAsync();
 
                 IsSuperAdmin = userRoles.Contains("Super Admin")
+                            || userRoles.Contains("COE")
                             || userRoles.Contains("CEO")
                             || userRoles.Contains("Administrator");
-                IsCOE        = userRoles.Contains("COE") || userRoles.Contains("Admin");
-                IsFaculty    = userRoles.Contains("Faculty");
+                IsCOE = userRoles.Contains("COE") || userRoles.Contains("Admin");
+                IsFaculty = userRoles.Contains("Faculty");
 
                 if (!IsSuperAdmin && !IsCOE && !IsFaculty)
                 {
@@ -69,6 +66,13 @@ namespace ACGCET_Admin.ViewModels.Dashboard
                     ResetLogin();
                     return;
                 }
+
+                // Load RBAC permissions for this user
+                await _permissionService.LoadPermissionsAsync(_db, message.User.AdminUserId);
+                UserPermissionService.Current = _permissionService;
+
+                // Set SESSION_CONTEXT on the main DbContext for audit triggers
+                _db.SetSessionContext(message.User.UserName);
 
                 CurrentView = new DashboardViewModel(_db, message.User, IsSuperAdmin, IsCOE);
             }
@@ -80,16 +84,6 @@ namespace ACGCET_Admin.ViewModels.Dashboard
             }
         }
 
-        // ── Forgot Password Navigation ─────────────────
-        public void Receive(NavigateToForgotPasswordMessage _)
-        {
-            CurrentView = new ForgotPasswordViewModel(_db, _email);
-        }
-
-        public void Receive(ResetPasswordCompleteMessage _)
-        {
-            ResetLogin();
-        }
 
         // ── Logout ────────────────────────────────────
         public void Receive(LogoutMessage _) => ResetLogin();
@@ -97,12 +91,14 @@ namespace ACGCET_Admin.ViewModels.Dashboard
         private void ResetLogin()
         {
             IsSuperAdmin = false;
-            IsCOE        = false;
-            IsFaculty    = false;
+            IsCOE = false;
+            IsFaculty = false;
+            _permissionService?.Clear();
+            IsFaculty = false;
 
-            _loginVm.Username          = string.Empty;
-            _loginVm.Password          = string.Empty;
-            _loginVm.IsErrorVisible    = false;
+            _loginVm.Username = string.Empty;
+            _loginVm.Password = string.Empty;
+            _loginVm.IsErrorVisible = false;
             _loginVm.IsPasswordVisible = false;
             CurrentView = _loginVm;
         }

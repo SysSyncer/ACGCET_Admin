@@ -1,0 +1,103 @@
+<UserControl x:Class="ACGCET_Admin.Views.DataManagement.ManagePassingCriteriaView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:vm="clr-namespace:ACGCET_Admin.ViewModels.DataManagement"
+             d:DataContext="{d:DesignInstance Type=vm:ManagePassingCriteriaViewModel}"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d">
+    <StackPanel>
+        <TextBlock Text="Manage Passing Criteria"
+                FontSize="20"
+                FontWeight="SemiBold"
+                Foreground="#09090B"
+                Margin="0 0 0 18"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="400"/>
+                <ColumnDefinition Width="24"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0"
+                    Background="White"
+                    BorderThickness="1"
+                    BorderBrush="#E4E4E7"
+                    Padding="20">
+                <StackPanel>
+                    <TextBlock Text="Add Passing Criteria"
+                            FontSize="14"
+                            FontWeight="SemiBold"
+                            Foreground="#09090B"
+                            Margin="0 0 0 16"/>
+                    <ComboBox ItemsSource="{Binding CourseList}"
+                            SelectedItem="{Binding SelectedCourse}"
+                            DisplayMemberPath="CourseName"
+                              Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                            md:HintAssist.Hint="Course"
+                            Margin="0 0 0 12"/>
+                    <ComboBox ItemsSource="{Binding BatchList}"
+                            SelectedItem="{Binding SelectedBatch}"
+                            DisplayMemberPath="BatchName"
+                              Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                            md:HintAssist.Hint="Batch"
+                            Margin="0 0 0 12"/>
+                    <TextBox Text="{Binding MinimumCredits, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                            Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             md:HintAssist.Hint="Minimum Credits"
+                            Margin="0 0 0 12"/>
+                    <TextBox Text="{Binding MinimumPapers, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                            Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             md:HintAssist.Hint="Minimum Papers"
+                            Margin="0 0 0 20"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Save"
+                                Command="{Binding SaveCommand}"
+                                Style="{StaticResource PrimaryButton}"
+                                Width="100"/>
+                        <Button Content="Clear"
+                                Command="{Binding ClearCommand}"
+                                Style="{StaticResource SubtleButton}"
+                                Width="80"
+                                Margin="8 0 0 0"/>
+                        <Button Content="Delete"
+                                Command="{Binding DeleteCommand}"
+                                Style="{StaticResource DangerButton}"
+                                Width="90"
+                                Margin="8 0 0 0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="2"
+                    Background="White"
+                    BorderThickness="1"
+                    BorderBrush="#E4E4E7">
+                <DataGrid ItemsSource="{Binding Criteria}"
+                        SelectedItem="{Binding SelectedCriterion}"
+                          AutoGenerateColumns="False"
+                        CanUserAddRows="False"
+                        IsReadOnly="True"
+                        HeadersVisibility="Column"
+                        BorderThickness="0">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID"
+                                Binding="{Binding PassingCriterionId}"
+                                Width="50"/>
+                        <DataGridTextColumn Header="Course"
+                                Binding="{Binding Course.CourseName}"
+                                Width="*"/>
+                        <DataGridTextColumn Header="Batch"
+                                Binding="{Binding Batch.BatchName}"
+                                Width="120"/>
+                        <DataGridTextColumn Header="Min Credits"
+                                Binding="{Binding MinimumCredits}"
+                                Width="100"/>
+                        <DataGridTextColumn Header="Min Papers"
+                                Binding="{Binding MinimumPapers}"
+                                Width="100"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+        </Grid>
+    </StackPanel>
+</UserControl>

@@ -68,7 +68,7 @@ namespace ACGCET_Admin.ViewModels.Application
 
         public ClassWiseIntExtReportViewModel()
         {
-             _dbContext = null!;
+            _dbContext = null!;
         }
 
         private async Task InitializeAsync()
@@ -118,23 +118,23 @@ namespace ACGCET_Admin.ViewModels.Application
                 // Fetch Students
                 var query = _dbContext.Students.AsQueryable();
 
-                if (SelectedProgram != "Select") 
+                if (SelectedProgram != "Select")
                     query = query.Where(s => s.Batch!.Course!.Program!.ProgramName == SelectedProgram);
                 if (SelectedRegulation != "Select")
                     query = query.Where(s => s.Regulation!.RegulationName == SelectedRegulation);
                 if (SelectedSection != "Select" && SelectedSection != "Overall")
                     query = query.Where(s => s.Section!.SectionName == SelectedSection);
-                
+
                 var students = await query.OrderBy(s => s.RollNumber).ToListAsync();
-                if (!students.Any()) 
+                if (!students.Any())
                 {
-                     ReportData = null;
-                     return;
+                    ReportData = null;
+                    return;
                 }
 
                 // Fetch Papers for the selected Semester
                 int sem = int.TryParse(SelectedSemester, out int s) ? s : 0;
-                
+
                 var papers = await _dbContext.Papers
                     .Include(p => p.Course)
                     .Where(p => p.Course!.Program!.ProgramName == SelectedProgram &&
@@ -159,7 +159,7 @@ namespace ACGCET_Admin.ViewModels.Application
 
                 // Pre-fetch all marks for efficiency
                 var studentIds = students.Select(s => (int?)s.StudentId).ToList();
-                var paperIds   = papers.Select(p => (int?)p.PaperId).ToList();
+                var paperIds = papers.Select(p => (int?)p.PaperId).ToList();
 
                 var examination = SelectedExamination != "Select"
                     ? await _dbContext.Examinations
@@ -223,13 +223,22 @@ namespace ACGCET_Admin.ViewModels.Application
         }
 
         [RelayCommand]
-        private void PrintPreview() 
+        private void PrintPreview()
         {
+            if (ReportData == null || ReportData.Count == 0)
+            {
+                MessageBox.Show("No data to print. Please generate a report first.", "Print", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            var printService = new Services.PrintService();
+            var title = $"Class Wise Int/Ext Report — {SelectedProgram} Sem {SelectedSemester}";
+            printService.GenerateDataTableReport(ReportData, title);
         }
 
         [RelayCommand]
-        private void Print() 
+        private void Print()
         {
+            PrintPreview();
         }
 
         [RelayCommand]

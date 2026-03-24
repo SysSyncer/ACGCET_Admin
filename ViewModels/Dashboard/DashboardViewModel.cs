@@ -12,17 +12,18 @@ using ACGCET_Admin.ViewModels.AdminControl;
 using ACGCET_Admin.ViewModels.MissingEntry;
 using ACGCET_Admin.ViewModels.EntryReport;
 using ACGCET_Admin.ViewModels.DeleteEntry;
+using ACGCET_Admin.ViewModels.DataManagement;
 
 namespace ACGCET_Admin.ViewModels.Dashboard
 {
     public partial class DashboardViewModel : ObservableObject
     {
         private readonly AcgcetDbContext _db;
-        private readonly AdminUser?      _loggedInUser;
+        private readonly AdminUser? _loggedInUser;
 
-        [ObservableProperty] private object _currentView    = new object();
+        [ObservableProperty] private object _currentView = new object();
         [ObservableProperty] private string _welcomeMessage = "Welcome to ACGCET Admin Dashboard";
-        [ObservableProperty] private bool   _isDrawerOpen   = true;
+        [ObservableProperty] private bool _isDrawerOpen = true;
 
         /// <summary>Only COE role users can manage admin/faculty accounts.</summary>
         public bool CanManageUsers { get; }
@@ -37,16 +38,16 @@ namespace ACGCET_Admin.ViewModels.Dashboard
         public DashboardViewModel(AcgcetDbContext db, AdminUser? loggedInUser,
                                   bool isSuperAdmin, bool isCOE)
         {
-            _db            = db;
-            _loggedInUser  = loggedInUser;
+            _db = db;
+            _loggedInUser = loggedInUser;
             CanManageUsers = isCOE;
-            UserRoleLabel  = isCOE ? "COE" : "Admin Staff";
+            UserRoleLabel = isCOE ? "COE" : "Admin Staff";
 
-            string name    = loggedInUser?.FullName ?? loggedInUser?.UserName ?? "User";
+            string name = loggedInUser?.FullName ?? loggedInUser?.UserName ?? "User";
             WelcomeMessage = $"Welcome, {name}";
             UserDisplayName = name;
-            UserInitials    = BuildInitials(name);
-            IsDrawerOpen    = true;
+            UserInitials = BuildInitials(name);
+            IsDrawerOpen = true;
 
             CurrentView = new HomeViewModel(_db);
         }
@@ -67,23 +68,23 @@ namespace ACGCET_Admin.ViewModels.Dashboard
             switch (destination)
             {
                 case "Home":
-                    CurrentView    = new HomeViewModel(_db);
+                    CurrentView = new HomeViewModel(_db);
                     WelcomeMessage = $"Welcome, {_loggedInUser?.FullName ?? "User"}";
                     break;
                 case "Application":
-                    CurrentView    = new ApplicationViewModel(_db);
+                    CurrentView = new ApplicationViewModel(_db);
                     WelcomeMessage = "Exam Applications";
                     break;
                 case "AdminControl":
-                    CurrentView    = new AdminControlViewModel(_db);
+                    CurrentView = new AdminControlViewModel(_db);
                     WelcomeMessage = "Admin Control";
                     break;
                 case "MissingEntry":
-                    CurrentView    = new MissingEntryViewModel(_db);
+                    CurrentView = new MissingEntryViewModel(_db);
                     WelcomeMessage = "Missing Entries";
                     break;
                 case "DeleteEntry":
-                    CurrentView    = new DeleteEntryViewModel(_db);
+                    CurrentView = new DeleteEntryViewModel(_db);
                     WelcomeMessage = "Delete Entries";
                     break;
                 case "EntryReport":
@@ -95,10 +96,14 @@ namespace ACGCET_Admin.ViewModels.Dashboard
                         new ResultEntryReportViewModel(_db));
                     WelcomeMessage = "Entry Reports";
                     break;
+                case "DataManagement":
+                    CurrentView = new DataManagementViewModel(_db);
+                    WelcomeMessage = "Data Management";
+                    break;
                 case "UserManagement":
                     if (CanManageUsers)
                     {
-                        CurrentView    = new UserManagementViewModel(_db, _loggedInUser);
+                        CurrentView = new UserManagementViewModel(_db, _loggedInUser);
                         WelcomeMessage = "User Management";
                     }
                     break;
@@ -121,15 +126,15 @@ namespace ACGCET_Admin.ViewModels.Dashboard
         private int _totalLogCount;
 
         // KPI stats
-        [ObservableProperty] private int    _totalStudents;
-        [ObservableProperty] private int    _totalApplications;
-        [ObservableProperty] private int    _pendingRevaluations;
-        [ObservableProperty] private int    _totalPassedResults;
-        [ObservableProperty] private int    _totalFailedResults;
+        [ObservableProperty] private int _totalStudents;
+        [ObservableProperty] private int _totalApplications;
+        [ObservableProperty] private int _pendingRevaluations;
+        [ObservableProperty] private int _totalPassedResults;
+        [ObservableProperty] private int _totalFailedResults;
         [ObservableProperty] private string _latestExamLabel = "—";
-        [ObservableProperty] private int    _missingInternalCount;
-        [ObservableProperty] private int    _missingExternalCount;
-        [ObservableProperty] private int    _pendingApplications;
+        [ObservableProperty] private int _missingInternalCount;
+        [ObservableProperty] private int _missingExternalCount;
+        [ObservableProperty] private int _pendingApplications;
 
         // Pagination
         [ObservableProperty]
@@ -142,13 +147,13 @@ namespace ACGCET_Admin.ViewModels.Dashboard
         [NotifyPropertyChangedFor(nameof(LogsPageInfo))]
         private int _logsTotalPages = 1;
 
-        public bool   CanGoPrevLogs => LogsCurrentPage > 1;
-        public bool   CanGoNextLogs => LogsCurrentPage < LogsTotalPages;
-        public string LogsPageInfo  => $"Page {LogsCurrentPage} of {LogsTotalPages}";
+        public bool CanGoPrevLogs => LogsCurrentPage > 1;
+        public bool CanGoNextLogs => LogsCurrentPage < LogsTotalPages;
+        public string LogsPageInfo => $"Page {LogsCurrentPage} of {LogsTotalPages}";
 
         [ObservableProperty] private ObservableCollection<ModuleLockInfo> _moduleLockStatuses = new();
-        [ObservableProperty] private ObservableCollection<AuditLog>       _recentLogs         = new();
-        [ObservableProperty] private ObservableCollection<SystemAlert>    _recentAlerts       = new();
+        [ObservableProperty] private ObservableCollection<AuditLog> _recentLogs = new();
+        [ObservableProperty] private ObservableCollection<SystemAlert> _recentAlerts = new();
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsNotLoading))]
@@ -210,17 +215,17 @@ namespace ACGCET_Admin.ViewModels.Dashboard
                     .OrderByDescending(e => e.ExaminationId)
                     .FirstOrDefaultAsync();
 
-                int totalApps       = 0;
-                int pendingApps     = 0;
-                int passed          = 0;
-                int failed          = 0;
+                int totalApps = 0;
+                int pendingApps = 0;
+                int passed = 0;
+                int failed = 0;
                 int missingInternal = 0;
                 int missingExternal = 0;
                 var moduleLockInfos = new System.Collections.Generic.List<ModuleLockInfo>();
 
                 if (latestExam != null)
                 {
-                    totalApps   = await _db.ExamApplications
+                    totalApps = await _db.ExamApplications
                         .Where(a => a.ExaminationId == latestExam.ExaminationId).CountAsync();
                     pendingApps = await _db.ExamApplications
                         .Where(a => a.ExaminationId == latestExam.ExaminationId
@@ -248,15 +253,30 @@ namespace ACGCET_Admin.ViewModels.Dashboard
                         .Select(m => m.StudentId).Distinct().ToListAsync();
                     missingExternal = appStudentIds.Count - studentsWithExt.Count;
 
-                    var locks = await _db.ModuleLocks
-                        .Include(ml => ml.Module)
+                    // Merge global (ExaminationId=null) and exam-scoped locks per module
+                    var allModules = await _db.Modules.ToListAsync();
+                    var globalLocks = await _db.ModuleLocks
+                        .Where(ml => ml.ExaminationId == null)
+                        .ToListAsync();
+                    var examLocks = await _db.ModuleLocks
                         .Where(ml => ml.ExaminationId == latestExam.ExaminationId)
                         .ToListAsync();
-                    moduleLockInfos = locks.Select(ml => new ModuleLockInfo
+
+                    moduleLockInfos = allModules.Select(mod =>
                     {
-                        ModuleName = ml.Module?.ModuleName ?? ml.Module?.ModuleCode ?? "Unknown",
-                        IsLocked   = ml.IsLocked ?? false,
-                        LockedBy   = ml.LockedBy ?? ""
+                        var gl = globalLocks.FirstOrDefault(l => l.ModuleId == mod.ModuleId);
+                        var el = examLocks.FirstOrDefault(l => l.ModuleId == mod.ModuleId);
+                        bool isLocked = (gl != null && (gl.IsLocked ?? false))
+                                     || (el != null && (el.IsLocked ?? false));
+                        string lockedBy = isLocked
+                            ? (el?.LockedBy ?? gl?.LockedBy ?? "")
+                            : "";
+                        return new ModuleLockInfo
+                        {
+                            ModuleName = mod.ModuleName ?? mod.ModuleCode ?? "Unknown",
+                            IsLocked = isLocked,
+                            LockedBy = lockedBy
+                        };
                     }).ToList();
                 }
 
@@ -278,21 +298,21 @@ namespace ACGCET_Admin.ViewModels.Dashboard
 
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
-                    TotalStudents        = totalStudents;
-                    TotalApplications    = totalApps;
-                    PendingApplications  = pendingApps;
-                    TotalPassedResults   = passed;
-                    TotalFailedResults   = failed;
-                    PendingRevaluations  = pendingRevs;
+                    TotalStudents = totalStudents;
+                    TotalApplications = totalApps;
+                    PendingApplications = pendingApps;
+                    TotalPassedResults = passed;
+                    TotalFailedResults = failed;
+                    PendingRevaluations = pendingRevs;
                     MissingInternalCount = missingInternal < 0 ? 0 : missingInternal;
                     MissingExternalCount = missingExternal < 0 ? 0 : missingExternal;
-                    LatestExamLabel      = latestExam?.ExamMonth ?? "N/A";
-                    ModuleLockStatuses   = new ObservableCollection<ModuleLockInfo>(moduleLockInfos);
-                    RecentLogs           = new ObservableCollection<AuditLog>(firstPageLogs);
-                    RecentAlerts         = new ObservableCollection<SystemAlert>(alerts);
-                    LogsCurrentPage      = 1;
-                    LogsTotalPages       = Math.Max(1, (int)Math.Ceiling((double)_totalLogCount / LogsPageSize));
-                    IsLoading            = false;
+                    LatestExamLabel = latestExam?.ExamMonth ?? "N/A";
+                    ModuleLockStatuses = new ObservableCollection<ModuleLockInfo>(moduleLockInfos);
+                    RecentLogs = new ObservableCollection<AuditLog>(firstPageLogs);
+                    RecentAlerts = new ObservableCollection<SystemAlert>(alerts);
+                    LogsCurrentPage = 1;
+                    LogsTotalPages = Math.Max(1, (int)Math.Ceiling((double)_totalLogCount / LogsPageSize));
+                    IsLoading = false;
                 });
             }
             catch (Exception ex)
@@ -306,8 +326,8 @@ namespace ACGCET_Admin.ViewModels.Dashboard
     public class ModuleLockInfo
     {
         public string ModuleName { get; set; } = "";
-        public bool   IsLocked   { get; set; }
-        public string LockedBy   { get; set; } = "";
+        public bool IsLocked { get; set; }
+        public string LockedBy { get; set; } = "";
         public string StatusLabel => IsLocked ? "LOCKED" : "OPEN";
     }
 }

@@ -68,7 +68,7 @@ namespace ACGCET_Admin.ViewModels.Application
 
         public YearWiseIntExtReportViewModel()
         {
-             _dbContext = null!;
+            _dbContext = null!;
         }
 
         private async Task InitializeAsync()
@@ -118,27 +118,27 @@ namespace ACGCET_Admin.ViewModels.Application
                 // Fetch Students
                 var query = _dbContext.Students.AsQueryable();
 
-                if (SelectedProgram != "Select") 
+                if (SelectedProgram != "Select")
                     query = query.Where(s => s.Batch!.Course!.Program!.ProgramName == SelectedProgram);
                 if (SelectedRegulation != "Select")
                     query = query.Where(s => s.Regulation!.RegulationName == SelectedRegulation);
                 if (SelectedSection != "Select" && SelectedSection != "Overall")
                     query = query.Where(s => s.Section!.SectionName == SelectedSection);
-                
+
                 // Semester filter? Assuming current batch matches semester or use user input.
                 // We also need Papers for this semester to build columns.
 
                 var students = await query.OrderBy(s => s.RollNumber).ToListAsync();
-                if (!students.Any()) 
+                if (!students.Any())
                 {
-                     ReportData = null;
-                     return;
+                    ReportData = null;
+                    return;
                 }
 
                 // Fetch Papers for the selected Semester/Regulation/Program
                 // Need to parse SelectedSemester
                 int sem = int.TryParse(SelectedSemester, out int s) ? s : 0;
-                
+
                 var papers = await _dbContext.Papers
                     .Include(p => p.Course)
                     .Where(p => p.Course!.Program!.ProgramName == SelectedProgram &&
@@ -155,7 +155,7 @@ namespace ACGCET_Admin.ViewModels.Application
                 // Actually, I'll check `AcgcetDbContext` context if I can view it.
                 // But for now, I'll assume I can access InternalMarks.
                 // 'StuExtValidityConv' logical equivalent?
-                
+
                 // Create DataTable
                 var dt = new DataTable();
                 dt.Columns.Add("SNo");
@@ -172,7 +172,7 @@ namespace ACGCET_Admin.ViewModels.Application
 
                 // Pre-fetch all marks for efficiency
                 var studentIds = students.Select(s => (int?)s.StudentId).ToList();
-                var paperIds   = papers.Select(p => (int?)p.PaperId).ToList();
+                var paperIds = papers.Select(p => (int?)p.PaperId).ToList();
 
                 var examination = SelectedExamination != "Select"
                     ? await _dbContext.Examinations
@@ -237,14 +237,22 @@ namespace ACGCET_Admin.ViewModels.Application
         }
 
         [RelayCommand]
-        private void PrintPreview() 
+        private void PrintPreview()
         {
-            // Print Logic for DataTable
+            if (ReportData == null || ReportData.Count == 0)
+            {
+                MessageBox.Show("No data to print. Please generate a report first.", "Print", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            var printService = new Services.PrintService();
+            var title = $"Year Wise Int/Ext Report — {SelectedProgram} Sem {SelectedSemester}";
+            printService.GenerateDataTableReport(ReportData, title);
         }
 
         [RelayCommand]
-        private void Print() 
+        private void Print()
         {
+            PrintPreview();
         }
 
         [RelayCommand]

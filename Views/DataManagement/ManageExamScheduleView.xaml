@@ -1,0 +1,105 @@
+<UserControl x:Class="ACGCET_Admin.Views.DataManagement.ManageExamScheduleView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:vm="clr-namespace:ACGCET_Admin.ViewModels.DataManagement"
+             d:DataContext="{d:DesignInstance Type=vm:ManageExamScheduleViewModel}"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d">
+    <StackPanel>
+        <TextBlock Text="Manage Exam Schedule"
+                FontSize="20"
+                FontWeight="SemiBold"
+                Foreground="#09090B"
+                Margin="0 0 0 18"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="400"/>
+                <ColumnDefinition Width="24"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0"
+                    Background="White"
+                    BorderThickness="1"
+                    BorderBrush="#E4E4E7"
+                    Padding="20">
+                <StackPanel>
+                    <TextBlock Text="Add Schedule Entry"
+                            FontSize="14"
+                            FontWeight="SemiBold"
+                            Foreground="#09090B"
+                            Margin="0 0 0 16"/>
+                    <ComboBox ItemsSource="{Binding ExaminationList}"
+                            SelectedItem="{Binding SelectedExamination}"
+                            DisplayMemberPath="ExamCode"
+                              Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                            md:HintAssist.Hint="Examination"
+                            Margin="0 0 0 12"/>
+                    <ComboBox ItemsSource="{Binding PaperList}"
+                            SelectedItem="{Binding SelectedPaper}"
+                            DisplayMemberPath="PaperCode"
+                              Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                            md:HintAssist.Hint="Paper"
+                            Margin="0 0 0 12"/>
+                    <DatePicker SelectedDate="{Binding ExamDate}"
+                            Style="{StaticResource MaterialDesignOutlinedDatePicker}"
+                                md:HintAssist.Hint="Exam Date"
+                            Margin="0 0 0 12"/>
+                    <ComboBox ItemsSource="{Binding ExamSessionList}"
+                            SelectedItem="{Binding SelectedExamSession}"
+                            DisplayMemberPath="SessionName"
+                              Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                            md:HintAssist.Hint="Session (FN/AN)"
+                            Margin="0 0 0 20"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Save"
+                                Command="{Binding SaveCommand}"
+                                Style="{StaticResource PrimaryButton}"
+                                Width="100"/>
+                        <Button Content="Clear"
+                                Command="{Binding ClearCommand}"
+                                Style="{StaticResource SubtleButton}"
+                                Width="80"
+                                Margin="8 0 0 0"/>
+                        <Button Content="Delete"
+                                Command="{Binding DeleteCommand}"
+                                Style="{StaticResource DangerButton}"
+                                Width="90"
+                                Margin="8 0 0 0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="2"
+                    Background="White"
+                    BorderThickness="1"
+                    BorderBrush="#E4E4E7">
+                <DataGrid ItemsSource="{Binding Schedules}"
+                        SelectedItem="{Binding SelectedSchedule}"
+                          AutoGenerateColumns="False"
+                        CanUserAddRows="False"
+                        IsReadOnly="True"
+                        HeadersVisibility="Column"
+                        BorderThickness="0">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID"
+                                Binding="{Binding ExamScheduleId}"
+                                Width="50"/>
+                        <DataGridTextColumn Header="Exam"
+                                Binding="{Binding Examination.ExamCode}"
+                                Width="120"/>
+                        <DataGridTextColumn Header="Paper"
+                                Binding="{Binding Paper.PaperCode}"
+                                Width="100"/>
+                        <DataGridTextColumn Header="Date"
+                                Binding="{Binding ExamDate}"
+                                Width="100"/>
+                        <DataGridTextColumn Header="Session"
+                                Binding="{Binding ExamSession.SessionName}"
+                                Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+        </Grid>
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,260 @@
+<UserControl x:Class="ACGCET_Admin.Views.DataManagement.ManageStudentsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:vm="clr-namespace:ACGCET_Admin.ViewModels.DataManagement"
+             d:DataContext="{d:DesignInstance Type=vm:ManageStudentsViewModel}"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d">
+    <StackPanel>
+        <TextBlock Text="Manage Students"
+                FontSize="20"
+                FontWeight="SemiBold"
+                Foreground="#09090B"
+                Margin="0 0 0 18"/>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="420"/>
+                <ColumnDefinition Width="24"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ── Left: Single Student Form + CSV ── -->
+            <StackPanel Grid.Column="0">
+
+                <!-- Single Student Form -->
+                <Border Background="White"
+                        BorderThickness="1"
+                        BorderBrush="#E4E4E7"
+                        Padding="20"
+                        Margin="0 0 0 16">
+                    <StackPanel>
+                        <TextBlock Text="Add Single Student"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Foreground="#09090B"
+                                Margin="0 0 0 16"/>
+
+                        <TextBox Text="{Binding FullName, UpdateSourceTrigger=PropertyChanged}"
+                                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 md:HintAssist.Hint="Full Name *"
+                                Margin="0 0 0 10"/>
+                        <Grid Margin="0 0 0 10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0"
+                                    Text="{Binding AdmissionNumber, UpdateSourceTrigger=PropertyChanged}"
+                                    Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     md:HintAssist.Hint="Admission No"/>
+                            <TextBox Grid.Column="2"
+                                    Text="{Binding RollNumber, UpdateSourceTrigger=PropertyChanged}"
+                                    Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     md:HintAssist.Hint="Roll Number"/>
+                        </Grid>
+                        <TextBox Text="{Binding RegistrationNumber, UpdateSourceTrigger=PropertyChanged}"
+                                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 md:HintAssist.Hint="Registration Number"
+                                Margin="0 0 0 10"/>
+                        <Grid Margin="0 0 0 10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <DatePicker Grid.Column="0"
+                                    SelectedDate="{Binding DateOfBirth}"
+                                    Style="{StaticResource MaterialDesignOutlinedDatePicker}"
+                                        md:HintAssist.Hint="Date of Birth"/>
+                            <ComboBox Grid.Column="2"
+                                    ItemsSource="{Binding Genders}"
+                                    SelectedItem="{Binding Gender}"
+                                      Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                    md:HintAssist.Hint="Gender"/>
+                        </Grid>
+                        <Grid Margin="0 0 0 10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0"
+                                    Text="{Binding MobileNumber, UpdateSourceTrigger=PropertyChanged}"
+                                    Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     md:HintAssist.Hint="Mobile"/>
+                            <TextBox Grid.Column="2"
+                                    Text="{Binding EmailAddress, UpdateSourceTrigger=PropertyChanged}"
+                                    Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     md:HintAssist.Hint="Email"/>
+                        </Grid>
+
+                        <!-- Academic dropdowns - cascading -->
+                        <ComboBox ItemsSource="{Binding CourseList}"
+                                SelectedItem="{Binding SelectedCourse}"
+                                DisplayMemberPath="CourseName"
+                                  Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                md:HintAssist.Hint="Course"
+                                Margin="0 0 0 10"/>
+                        <Grid Margin="0 0 0 10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <ComboBox Grid.Column="0"
+                                    ItemsSource="{Binding BatchList}"
+                                    SelectedItem="{Binding SelectedBatch}"
+                                    DisplayMemberPath="BatchName"
+                                      Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                    md:HintAssist.Hint="Batch"/>
+                            <ComboBox Grid.Column="2"
+                                    ItemsSource="{Binding SectionList}"
+                                    SelectedItem="{Binding SelectedSection}"
+                                    DisplayMemberPath="SectionName"
+                                      Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                    md:HintAssist.Hint="Section"/>
+                        </Grid>
+                        <Grid Margin="0 0 0 10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <ComboBox Grid.Column="0"
+                                    ItemsSource="{Binding RegulationList}"
+                                    SelectedItem="{Binding SelectedRegulation}"
+                                    DisplayMemberPath="RegulationName"
+                                      Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                    md:HintAssist.Hint="Regulation"/>
+                            <ComboBox Grid.Column="2"
+                                    ItemsSource="{Binding CommunityList}"
+                                    SelectedItem="{Binding SelectedCommunity}"
+                                    DisplayMemberPath="CommunityName"
+                                      Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                    md:HintAssist.Hint="Community"/>
+                        </Grid>
+                        <TextBox Text="{Binding JoinYear, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 md:HintAssist.Hint="Join Year"
+                                Margin="0 0 0 16"/>
+
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Save Student"
+                                    Command="{Binding SaveCommand}"
+                                    Style="{StaticResource PrimaryButton}"
+                                    Width="120"/>
+                            <Button Content="Clear"
+                                    Command="{Binding ClearFormCommand}"
+                                    Style="{StaticResource SubtleButton}"
+                                    Width="80"
+                                    Margin="8 0 0 0"/>
+                            <Button Content="Delete"
+                                    Command="{Binding DeleteCommand}"
+                                    Style="{StaticResource DangerButton}"
+                                    Width="90"
+                                    Margin="8 0 0 0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- CSV Bulk Upload -->
+                <Border Background="White"
+                        BorderThickness="1"
+                        BorderBrush="#E4E4E7"
+                        Padding="20">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal"
+                                Margin="0 0 0 12">
+                            <md:PackIcon Kind="FileDelimited"
+                                    Width="18"
+                                    Height="18"
+                                    Foreground="#7C3AED"
+                                    VerticalAlignment="Center"/>
+                            <TextBlock Text="CSV Bulk Upload"
+                                    FontSize="14"
+                                    FontWeight="SemiBold"
+                                    Foreground="#09090B"
+                                    Margin="8 0 0 0"
+                                    VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="CSV headers: FullName, AdmissionNumber, RollNumber, RegistrationNumber, DateOfBirth, Gender, MobileNumber, EmailAddress, JoinYear, CourseCode, BatchYear, SectionCode, RegulationYear, Community"
+                                   FontSize="10"
+                                Foreground="#71717A"
+                                TextWrapping="Wrap"
+                                Margin="0 0 0 12"/>
+                        <Grid Margin="0 0 0 10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="8"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0"
+                                    Text="{Binding CsvFilePath}"
+                                    Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     md:HintAssist.Hint="CSV File Path"
+                                    IsReadOnly="True"/>
+                            <Button Grid.Column="2"
+                                    Content="Browse"
+                                    Command="{Binding BrowseCsvCommand}"
+                                    Style="{StaticResource SubtleButton}"
+                                    Height="38"/>
+                        </Grid>
+                        <Button Content="Import CSV"
+                                Command="{Binding ImportCsvCommand}"
+                                Style="{StaticResource PrimaryButton}"
+                                IsEnabled="{Binding IsImporting, Converter={StaticResource InverseBooleanConverter}}"
+                                HorizontalAlignment="Left"
+                                Width="130"
+                                Margin="0 0 0 8"/>
+                        <TextBlock Text="{Binding CsvStatus}"
+                                FontSize="11"
+                                Foreground="#71717A"
+                                TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- ── Right: Student Grid ── -->
+            <Border Grid.Column="2"
+                    Background="White"
+                    BorderThickness="1"
+                    BorderBrush="#E4E4E7">
+                <DataGrid ItemsSource="{Binding Students}"
+                        SelectedItem="{Binding SelectedStudent}"
+                          AutoGenerateColumns="False"
+                        CanUserAddRows="False"
+                        IsReadOnly="True"
+                          HeadersVisibility="Column"
+                        BorderThickness="0">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID"
+                                Binding="{Binding StudentId}"
+                                Width="50"/>
+                        <DataGridTextColumn Header="Reg No"
+                                Binding="{Binding RegistrationNumber}"
+                                Width="120"/>
+                        <DataGridTextColumn Header="Name"
+                                Binding="{Binding FullName}"
+                                Width="*"/>
+                        <DataGridTextColumn Header="Roll"
+                                Binding="{Binding RollNumber}"
+                                Width="80"/>
+                        <DataGridTextColumn Header="Course"
+                                Binding="{Binding Course.CourseName}"
+                                Width="120"/>
+                        <DataGridTextColumn Header="Batch"
+                                Binding="{Binding Batch.BatchName}"
+                                Width="80"/>
+                        <DataGridTextColumn Header="Section"
+                                Binding="{Binding Section.SectionName}"
+                                Width="70"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+        </Grid>
+    </StackPanel>
+</UserControl>

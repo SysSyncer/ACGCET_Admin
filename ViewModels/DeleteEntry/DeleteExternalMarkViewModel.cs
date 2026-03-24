@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using ACGCET_Admin.Services;
 
 namespace ACGCET_Admin.ViewModels.DeleteEntry
 {
@@ -33,7 +34,7 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
             {
                 var sessions = await _dbContext.ExamSessions.OrderByDescending(s => s.ExamSessionId).ToListAsync();
                 ExamSessions.Clear();
-                foreach(var s in sessions) ExamSessions.Add(s);
+                foreach (var s in sessions) ExamSessions.Add(s);
             }
             catch { /* ignore load errors */ }
         }
@@ -60,7 +61,7 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
                 .Where(m => m.StudentId == studentId && m.ExaminationId == exam.ExaminationId)
                 .ToListAsync();
 
-            foreach(var m in marks)
+            foreach (var m in marks)
             {
                 MarkList.Add(new DeleteExternalMarkItem
                 {
@@ -74,17 +75,18 @@ namespace ACGCET_Admin.ViewModels.DeleteEntry
         [RelayCommand]
         private async Task Delete()
         {
-             var selected = MarkList.Where(m => m.IsSelected).ToList();
-             if(!selected.Any()) { MessageBox.Show("Select marks"); return; }
-             if (MessageBox.Show($"Delete {selected.Count} marks?", "Confirm", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-             {
-                 var ids = selected.Select(m => m.ExternalMarkId).ToList();
-                 var toDelete = await _dbContext.ExternalMarks.Where(m => ids.Contains(m.ExternalMarkId)).ToListAsync();
-                 _dbContext.ExternalMarks.RemoveRange(toDelete);
-                 await _dbContext.SaveChangesAsync();
-                 await Search();
-                 MessageBox.Show("Deleted");
-             }
+            if (!UserPermissionService.Current.CanDelete("EXT_MARKS")) { MessageBox.Show("Access Denied: You do not have permission to delete external marks.", "RBAC", MessageBoxButton.OK, MessageBoxImage.Warning); return; }
+            var selected = MarkList.Where(m => m.IsSelected).ToList();
+            if (!selected.Any()) { MessageBox.Show("Select marks"); return; }
+            if (MessageBox.Show($"Delete {selected.Count} marks?", "Confirm", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                var ids = selected.Select(m => m.ExternalMarkId).ToList();
+                var toDelete = await _dbContext.ExternalMarks.Where(m => ids.Contains(m.ExternalMarkId)).ToListAsync();
+                _dbContext.ExternalMarks.RemoveRange(toDelete);
+                await _dbContext.SaveChangesAsync();
+                await Search();
+                MessageBox.Show("Deleted");
+            }
         }
 
         [RelayCommand] private void Clear() { RegNo = ""; StudentName = ""; MarkList.Clear(); }

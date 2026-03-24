@@ -1,9 +1,11 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ACGCET_Admin.Models;
+using ACGCET_Admin.Services;
 using System.Windows;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ACGCET_Admin.ViewModels.AdminControl
 {
@@ -27,7 +29,7 @@ namespace ACGCET_Admin.ViewModels.AdminControl
 
         [ObservableProperty]
         private string _paperCode = "";
-        
+
         [ObservableProperty]
         private string _paperName = "";
 
@@ -42,24 +44,22 @@ namespace ACGCET_Admin.ViewModels.AdminControl
         {
             _dbContext = dbContext;
         }
-        
+
         public ExtMarkEntryBarcodeViewModel() { _dbContext = null!; }
 
         [RelayCommand]
-        private void ProcessBarcode()
+        private async Task ProcessBarcode()
         {
             StatusMessage = "";
             if (string.IsNullOrWhiteSpace(Barcode)) return;
 
-            // Find ExamApplicationPaper by Barcode
-            // Needs Include?
-            var paperApp = _dbContext.ExamApplicationPapers
+            var paperApp = await _dbContext.ExamApplicationPapers
                 .Include(p => p.ExamApplication)
                 .ThenInclude(ea => ea!.Student)
                 .Include(p => p.Paper)
                 .Include(p => p.ExamApplication)
-                .ThenInclude(ea => ea!.Examination) 
-                .FirstOrDefault(p => p.Barcode == Barcode);
+                .ThenInclude(ea => ea!.Examination)
+                .FirstOrDefaultAsync(p => p.Barcode == Barcode);
 
             if (paperApp == null)
             {
@@ -72,16 +72,15 @@ namespace ACGCET_Admin.ViewModels.AdminControl
 
             _currentStudentId = paperApp.ExamApplication!.StudentId ?? 0;
             _currentPaperId = paperApp.PaperId ?? 0;
-            _currentExamId = paperApp.ExamApplication!.ExaminationId ?? 0; 
+            _currentExamId = paperApp.ExamApplication!.ExaminationId ?? 0;
 
             StudentRegNo = paperApp.ExamApplication!.Student!.RegistrationNumber ?? "";
             PaperCode = paperApp.Paper!.PaperCode;
             PaperName = paperApp.Paper!.PaperName;
-            
-            // Check if mark exists
-            var existingMark = _dbContext.ExternalMarks.FirstOrDefault(m => 
-                m.StudentId == _currentStudentId && 
-                m.PaperId == _currentPaperId && 
+
+            var existingMark = await _dbContext.ExternalMarks.FirstOrDefaultAsync(m =>
+                m.StudentId == _currentStudentId &&
+                m.PaperId == _currentPaperId &&
                 m.ExaminationId == _currentExamId);
 
             if (existingMark != null)
@@ -97,8 +96,14 @@ namespace ACGCET_Admin.ViewModels.AdminControl
         }
 
         [RelayCommand]
-        private void SaveMark()
+        private async Task SaveMark()
         {
+            if (!UserPermissionService.Current.CanCreate("EXT_MARKS"))
+            {
+                StatusMessage = "Access Denied — insufficient permissions";
+                return;
+            }
+
             if (_currentStudentId == 0 || _currentPaperId == 0)
             {
                 StatusMessage = "Scan Barcode First";
@@ -117,16 +122,17 @@ namespace ACGCET_Admin.ViewModels.AdminControl
                 return;
             }
 
-            var existingMark = _dbContext.ExternalMarks.FirstOrDefault(m => 
-                m.StudentId == _currentStudentId && 
-                m.PaperId == _currentPaperId && 
+            var existingMark = await _dbContext.ExternalMarks.FirstOrDefaultAsync(m =>
+                m.StudentId == _currentStudentId &&
+                m.PaperId == _currentPaperId &&
                 m.ExaminationId == _currentExamId);
 
             if (existingMark != null)
             {
                 existingMark.TotalMark = markVal;
+                existingMark.TheoryMark = markVal;
                 existingMark.ModifiedDate = DateTime.Now;
-                existingMark.ModifiedBy = "Admin"; 
+                existingMark.ModifiedBy = "Admin";
             }
             else
             {
@@ -135,14 +141,14 @@ namespace ACGCET_Admin.ViewModels.AdminControl
                     StudentId = _currentStudentId,
                     PaperId = _currentPaperId,
                     ExaminationId = _currentExamId,
-                    TheoryMark = 0, // Default,
+                    TotalMark = markVal,
+                    TheoryMark = markVal,
                     EnteredBy = "Admin",
                     EnteredDate = DateTime.Now
-                    // Theory/Lab separation? Accessing TotalMark for now as per schema
                 });
             }
 
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
             StatusMessage = "Mark Saved";
 
             // Reset for next

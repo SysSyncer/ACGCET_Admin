@@ -4,6 +4,9 @@ using ACGCET_Admin.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
+using System;
+using System.Collections.Generic;
 
 namespace ACGCET_Admin.ViewModels.MissingEntry
 {
@@ -30,6 +33,12 @@ namespace ACGCET_Admin.ViewModels.MissingEntry
         [ObservableProperty]
         private bool _isLoading;
 
+        private List<MissingEntryItem> _allReportData = new();
+
+        [ObservableProperty]
+        private string _searchText = string.Empty;
+        partial void OnSearchTextChanged(string value) => ApplyFilter();
+
         public MissingInternalEntryViewModel(AcgcetDbContext dbContext)
         {
             _dbContext = dbContext;
@@ -43,7 +52,7 @@ namespace ACGCET_Admin.ViewModels.MissingEntry
 
             // 1 to 8 Semesters
             for (int i = 1; i <= 8; i++) Semesters.Add(i.ToString());
-            
+
             LoadPapers();
         }
 
@@ -58,16 +67,16 @@ namespace ACGCET_Admin.ViewModels.MissingEntry
 
         partial void OnSelectedSemesterChanged(string value)
         {
-             // Reload papers based on Sem
-             if (!string.IsNullOrEmpty(value) && int.TryParse(value, out int sem))
-             {
-                 var papers = _dbContext.Papers
-                    .Where(p => p.Semester == sem)
-                    .OrderBy(p => p.PaperCode)
-                    .ToList();
-                 Papers.Clear();
-                 foreach(var p in papers) Papers.Add(p);
-             }
+            // Reload papers based on Sem
+            if (!string.IsNullOrEmpty(value) && int.TryParse(value, out int sem))
+            {
+                var papers = _dbContext.Papers
+                   .Where(p => p.Semester == sem)
+                   .OrderBy(p => p.PaperCode)
+                   .ToList();
+                Papers.Clear();
+                foreach (var p in papers) Papers.Add(p);
+            }
         }
 
         [RelayCommand]
@@ -76,24 +85,25 @@ namespace ACGCET_Admin.ViewModels.MissingEntry
             if (IsLoading) return;
             IsLoading = true;
             ReportData.Clear();
+            _allReportData.Clear();
 
             try
             {
                 if (SelectedSession == null) return;
-                
+
                 // Active Examination for Session?
                 // Logic: "Missing Entry" implies checking ExamApplications for the chosen Session.
                 // Find Examination for this Session
-                var exam = await _dbContext.Examinations.FirstOrDefaultAsync(e => e.ExamMonth == SelectedSession.SessionName); 
+                var exam = await _dbContext.Examinations.FirstOrDefaultAsync(e => e.ExamMonth == SelectedSession.SessionName);
                 // Wait, SessionName might not match ExamMonth directly.
                 // Assuming SelectedSession -> Examination logic exists. 
                 // Or user selects Examination directly. 
                 // Let's use ExamSessions for now, assuming Examination exists.
                 // Actually, schema has Examination.ExamMonth (String). 
-                
+
                 // Let's fetch ExamApplications joined with Papers.
                 // Filter by Paper if selected.
-                
+
                 var query = _dbContext.ExamApplicationPapers
                     .Include(eap => eap.ExamApplication)
                         .ThenInclude(ea => ea!.Student)
@@ -103,7 +113,7 @@ namespace ACGCET_Admin.ViewModels.MissingEntry
                 // if (SelectedSession != null) ... filter by ExamApp.ExaminationId?
                 // We need ExaminationId.
                 // If UI selects 'Nov 2023', we find ExamID for 'Nov 2023'.
-                
+
                 // Let's simplified: Check all ExamApplications for selected Paper (if provided), 
                 // and check if Internal exists for that Student+Paper.
                 // "Exam Apply" button in legacy UI prompts filtering by applied students.
@@ -112,37 +122,39 @@ namespace ACGCET_Admin.ViewModels.MissingEntry
                 {
                     query = query.Where(x => x.PaperId == SelectedPaper.PaperId);
                 }
-                
+
                 // Add Semester filter if Paper not selected
                 if (SelectedPaper == null && !string.IsNullOrEmpty(SelectedSemester))
                 {
-                     int sem = int.Parse(SelectedSemester);
-                     query = query.Where(x => x.Paper!.Semester == sem);
+                    int sem = int.Parse(SelectedSemester);
+                    query = query.Where(x => x.Paper!.Semester == sem);
                 }
 
                 var apps = await query.ToListAsync();
-                
+
                 var internalMarks = await _dbContext.InternalMarks
                     .Where(im => apps.Select(a => a.PaperId).Contains(im.PaperId)) // Optimization
                     .ToListAsync();
 
                 foreach (var app in apps)
                 {
-                     // Check if Internal Mark exists
-                     bool exists = internalMarks.Any(im => im.StudentId == app.ExamApplication!.StudentId && im.PaperId == app.PaperId);
-                     
-                     if (!exists)
-                     {
-                         ReportData.Add(new MissingEntryItem
-                         {
-                             RegNo = app.ExamApplication!.Student!.RegistrationNumber ?? "",
-                             StudentName = app.ExamApplication.Student.FullName ?? "",
-                             PaperCode = app.Paper!.PaperCode ?? "",
-                             Status = "Missing Internal",
-                             Course = app.Paper?.Course?.CourseCode ?? ""
-                         });
-                     }
+                    // Check if Internal Mark exists
+                    bool exists = internalMarks.Any(im => im.StudentId == app.ExamApplication!.StudentId && im.PaperId == app.PaperId);
+
+                    if (!exists)
+                    {
+                        _allReportData.Add(new MissingEntryItem
+                        {
+                            RegNo = app.ExamApplication!.Student!.RegistrationNumber ?? "",
+                            StudentName = app.ExamApplication.Student.FullName ?? "",
+                            PaperCode = app.Paper!.PaperCode ?? "",
+                            Status = "Missing Internal",
+                            Course = app.Paper?.Course?.CourseCode ?? ""
+                        });
+                    }
                 }
+                SearchText = string.Empty;
+                ApplyFilter();
             }
             finally
             {
@@ -150,10 +162,28 @@ namespace ACGCET_Admin.ViewModels.MissingEntry
             }
         }
 
+        private void ApplyFilter()
+        {
+            var filtered = string.IsNullOrWhiteSpace(SearchText)
+                ? _allReportData
+                : _allReportData.Where(x =>
+                    (x.RegNo?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (x.StudentName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (x.PaperCode?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false))
+                .ToList();
+            ReportData = new ObservableCollection<MissingEntryItem>(filtered);
+        }
+
         [RelayCommand]
         private void Print()
         {
-            // Placeholder
+            if (ReportData == null || ReportData.Count == 0)
+            {
+                MessageBox.Show("No data to print. Please search first.", "Print", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            var printService = new Services.PrintService();
+            printService.GenerateMissingEntryReport(ReportData, "Missing Internal Mark Entry Report");
         }
 
         [RelayCommand]

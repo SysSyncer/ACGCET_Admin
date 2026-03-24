@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="ACGCET_Admin.Views.AdminControl.NewUserCreationView"
+<UserControl x:Class="ACGCET_Admin.Views.AdminControl.NewUserCreationView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -27,7 +27,10 @@
             <PasswordBox x:Name="pbConfirm" materialDesign:HintAssist.Hint="Confirm Password" Margin="0 8" Style="{StaticResource MaterialDesignOutlinedPasswordBox}"
                          PasswordChanged="PbConfirm_PasswordChanged"/>
 
-            <ComboBox materialDesign:HintAssist.Hint="Department" ItemsSource="{Binding Departments}" SelectedItem="{Binding Department}" Margin="0 8"/>
+             <ComboBox materialDesign:HintAssist.Hint="Department" Margin="0 8"
+                      Style="{StaticResource MaterialDesignOutlinedComboBox}" Background="White"
+                      ItemsSource="{Binding Departments}"
+                      SelectedItem="{Binding Department}"/>
             
             <TextBox materialDesign:HintAssist.Hint="Designation" Text="{Binding Designation}" Margin="0 8" Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
             

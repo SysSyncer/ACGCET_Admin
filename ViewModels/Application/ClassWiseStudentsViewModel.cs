@@ -67,6 +67,16 @@ namespace ACGCET_Admin.ViewModels.Application
 
         public bool IsNotLoading => !IsLoading;
 
+        // Search
+        [ObservableProperty]
+        private string _searchText = string.Empty;
+
+        partial void OnSearchTextChanged(string value)
+        {
+            CurrentPage = 1;
+            ApplyPagination();
+        }
+
         // Pagination Properties
         private List<Student> _fullStudentList = new();
 
@@ -74,7 +84,7 @@ namespace ACGCET_Admin.ViewModels.Application
         private ObservableCollection<int> _pageSizes = new() { 10, 20, 50, 100 };
 
         [ObservableProperty]
-        private int _selectedPageSize = 30; // Default
+        private int _selectedPageSize = 20; // Default
 
         partial void OnSelectedPageSizeChanged(int value)
         {
@@ -242,14 +252,23 @@ namespace ACGCET_Admin.ViewModels.Application
 
         private void ApplyPagination()
         {
-            TotalRecords = _fullStudentList.Count;
+            var filtered = string.IsNullOrWhiteSpace(SearchText)
+                ? _fullStudentList
+                : _fullStudentList.Where(s =>
+                    (s.FullName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (s.RegistrationNumber?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (s.RollNumber?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (s.AdmissionNumber?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false))
+                .ToList();
+
+            TotalRecords = filtered.Count;
             TotalPages = (int)Math.Ceiling((double)TotalRecords / SelectedPageSize);
             if (TotalPages == 0) TotalPages = 1;
 
             if (CurrentPage > TotalPages) CurrentPage = TotalPages;
             if (CurrentPage < 1) CurrentPage = 1;
 
-            var pagedItems = _fullStudentList
+            var pagedItems = filtered
                                 .Skip((CurrentPage - 1) * SelectedPageSize)
                                 .Take(SelectedPageSize)
                                 .ToList();

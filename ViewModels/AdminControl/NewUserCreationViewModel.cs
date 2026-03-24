@@ -2,8 +2,10 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ACGCET_Admin.Models;
 using ACGCET_Admin.Helpers;
+using ACGCET_Admin.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace ACGCET_Admin.ViewModels.AdminControl
@@ -35,9 +37,9 @@ namespace ACGCET_Admin.ViewModels.AdminControl
         [ObservableProperty]
         private ObservableCollection<PermissionItem> _permissions = new();
 
-        public ObservableCollection<string> Departments { get; } = new ObservableCollection<string> 
-        { 
-            "Civil Engineering", "Mechanical Engineering", "EEE", "ECE", "CSE", "COE Office", "Principal Office" 
+        public ObservableCollection<string> Departments { get; } = new ObservableCollection<string>
+        {
+            "Civil Engineering", "Mechanical Engineering", "EEE", "ECE", "CSE", "COE Office", "Principal Office"
         };
 
         public NewUserCreationViewModel(AcgcetDbContext dbContext)
@@ -63,8 +65,14 @@ namespace ACGCET_Admin.ViewModels.AdminControl
         }
 
         [RelayCommand]
-        private void CreateUser()
+        private async Task CreateUser()
         {
+            if (!UserPermissionService.Current.CanCreate("USER_MGMT"))
+            {
+                MessageBox.Show("You do not have permission to create users.", "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
             {
                 MessageBox.Show("Username and Password are required.");
@@ -78,7 +86,7 @@ namespace ACGCET_Admin.ViewModels.AdminControl
             }
 
             // Check if user exists
-            if (_dbContext.AdminUsers.Any(u => u.UserName == Username))
+            if (await _dbContext.AdminUsers.AnyAsync(u => u.UserName == Username))
             {
                 MessageBox.Show("Username already exists.");
                 return;
@@ -96,7 +104,7 @@ namespace ACGCET_Admin.ViewModels.AdminControl
             };
 
             _dbContext.AdminUsers.Add(newUser);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             // Add Roles
             foreach (var perm in Permissions)
@@ -107,12 +115,12 @@ namespace ACGCET_Admin.ViewModels.AdminControl
                     {
                         AdminUserId = newUser.AdminUserId,
                         RoleId = perm.RoleId,
-                        AssignedBy = "Admin", // TODO: Get current user
+                        AssignedBy = "Admin",
                         AssignedDate = DateTime.Now
                     });
                 }
             }
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             MessageBox.Show("User Created Successfully!");
             Clear();

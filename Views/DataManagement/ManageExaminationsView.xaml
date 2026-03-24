@@ -1,0 +1,130 @@
+<UserControl x:Class="ACGCET_Admin.Views.DataManagement.ManageExaminationsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:vm="clr-namespace:ACGCET_Admin.ViewModels.DataManagement"
+             d:DataContext="{d:DesignInstance Type=vm:ManageExaminationsViewModel}"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d">
+    <StackPanel>
+        <TextBlock Text="Manage Examinations"
+                FontSize="20"
+                FontWeight="SemiBold"
+                Foreground="#09090B"
+                Margin="0 0 0 18"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="400"/>
+                <ColumnDefinition Width="24"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0"
+                    Background="White"
+                    BorderThickness="1"
+                    BorderBrush="#E4E4E7"
+                    Padding="20">
+                <StackPanel>
+                    <TextBlock Text="Add New Examination"
+                            FontSize="14"
+                            FontWeight="SemiBold"
+                            Foreground="#09090B"
+                            Margin="0 0 0 16"/>
+                    <TextBox Text="{Binding ExamCode, UpdateSourceTrigger=PropertyChanged}"
+                            Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             md:HintAssist.Hint="Exam Code *"
+                            Margin="0 0 0 12"/>
+                    <ComboBox ItemsSource="{Binding ExamTypeList}"
+                            SelectedItem="{Binding SelectedExamType}"
+                            DisplayMemberPath="TypeName"
+                              Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                            md:HintAssist.Hint="Exam Type"
+                            Margin="0 0 0 12"/>
+                    <Grid Margin="0 0 0 12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <ComboBox Grid.Column="0"
+                                ItemsSource="{Binding Months}"
+                                SelectedItem="{Binding ExamMonth}"
+                                  Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                md:HintAssist.Hint="Month"/>
+                        <TextBox Grid.Column="2"
+                                Text="{Binding ExamYear, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 md:HintAssist.Hint="Year"/>
+                    </Grid>
+                    <Grid Margin="0 0 0 12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <DatePicker Grid.Column="0"
+                                SelectedDate="{Binding StartDate}"
+                                Style="{StaticResource MaterialDesignOutlinedDatePicker}"
+                                    md:HintAssist.Hint="Start Date"/>
+                        <DatePicker Grid.Column="2"
+                                SelectedDate="{Binding EndDate}"
+                                Style="{StaticResource MaterialDesignOutlinedDatePicker}"
+                                    md:HintAssist.Hint="End Date"/>
+                    </Grid>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Save"
+                                Command="{Binding SaveCommand}"
+                                Style="{StaticResource PrimaryButton}"
+                                Width="100"/>
+                        <Button Content="Clear"
+                                Command="{Binding ClearCommand}"
+                                Style="{StaticResource SubtleButton}"
+                                Width="80"
+                                Margin="8 0 0 0"/>
+                        <Button Content="Delete"
+                                Command="{Binding DeleteCommand}"
+                                Style="{StaticResource DangerButton}"
+                                Width="90"
+                                Margin="8 0 0 0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="2"
+                    Background="White"
+                    BorderThickness="1"
+                    BorderBrush="#E4E4E7">
+                <DataGrid ItemsSource="{Binding Examinations}"
+                        SelectedItem="{Binding SelectedExamination}"
+                          AutoGenerateColumns="False"
+                        CanUserAddRows="False"
+                        IsReadOnly="True"
+                        HeadersVisibility="Column"
+                        BorderThickness="0">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID"
+                                Binding="{Binding ExaminationId}"
+                                Width="50"/>
+                        <DataGridTextColumn Header="Code"
+                                Binding="{Binding ExamCode}"
+                                Width="120"/>
+                        <DataGridTextColumn Header="Type"
+                                Binding="{Binding ExamType.TypeName}"
+                                Width="100"/>
+                        <DataGridTextColumn Header="Month"
+                                Binding="{Binding ExamMonth}"
+                                Width="90"/>
+                        <DataGridTextColumn Header="Year"
+                                Binding="{Binding ExamYear}"
+                                Width="60"/>
+                        <DataGridTextColumn Header="Start"
+                                Binding="{Binding StartDate}"
+                                Width="100"/>
+                        <DataGridTextColumn Header="End"
+                                Binding="{Binding EndDate}"
+                                Width="100"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+        </Grid>
+    </StackPanel>
+</UserControl>
