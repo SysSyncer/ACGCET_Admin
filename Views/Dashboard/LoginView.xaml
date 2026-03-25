@@ -243,10 +243,6 @@
                         HorizontalAlignment="Left"
                            Fill="#994A148C"
                         Margin="0 16 0 16"/>
-                <TextBlock Text="Integrity  ·  Industry  ·  Enterprise"
-                           FontSize="12"
-                        Foreground="#AAFFFFFF"
-                        FontStyle="Italic"/>
             </StackPanel>
         </Grid>
     </Grid>
