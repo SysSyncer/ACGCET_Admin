@@ -23,6 +23,7 @@ namespace ACGCET_Admin
                 _host = Host.CreateDefaultBuilder()
                     .ConfigureAppConfiguration((_, config) =>
                     {
+                        config.Sources.Clear();
                         config.SetBasePath(AppContext.BaseDirectory);
                         config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
                     })
